@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enrekang Elektronik</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* Header Styling */
+        header {
+            background: linear-gradient(135deg, #7a5032 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            width: 100%;
+            padding-left: 20px;
+            padding-right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .logo-section img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            font-family: 'sans-serif';
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-title span {
+            color: #ffffff;
+        }
+
+        /* Header Menu Styling */
+        .header-menu {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex: 1;
+            justify-content: center; 
+            margin: 0;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+
+        .header-menu a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-menu a i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .header-menu a:hover {
+            background-color: rgba(52, 152, 219, 0.3);
+            border-color: #db9334;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-menu a.active {
+            background: linear-gradient(135deg, #513509 0%, #905610 100%);
+            border-color: #9e6d12;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(97, 70, 7, 0.4);
+        }
+
+        /* Profile Section Styling */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .profile-section:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .profile-name {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .profile-role {
+            color: #bdc3c7;
+            font-size: 12px;
+        }
+
+        /* Area Konten Utama */
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="Logo_Enrekang_Elektronik.png" alt="Logo">
+            </div>
+            <div class="header-text">
+                <h1 class="header-title">Enrekang <span>Elektronik</span></h1>
+            </div>
+            <ul class="header-menu">
+                <li><a href="#" class="menu-link active" data-menu="dashboard"><i class="fas fa-th-large"></i>Dashboard</a></li>
+                <li><a href="#" class="menu-link" data-menu="stok"><i class="fas fa-boxes"></i>Stok</a></li>
+                <li><a href="#" class="menu-link" data-menu="penjualan"><i class="fas fa-shopping-cart"></i>Penjualan</a></li>
+                <li><a href="#" class="menu-link" data-menu="transaksi"><i class="fas fa-exchange-alt"></i>Transaksi</a></li>
+                <li><a href="#" class="menu-link" data-menu="laporan"><i class="fas fa-chart-bar"></i>Laporan</a></li>
+            </ul>
+            <div class="profile-section">
+                <div class="profile-avatar">
+                    <img src="foto_profil.png" alt="Profile Avatar">
+                </div>
+                <div class="profile-info">
+                    <div class="profile-name">Alif Batara Radja</div>
+                    <div class="profile-role">Product Manager</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="konten-utama">
+        <h3>Memuat data...</h3>
+    </main>
+
+    <script>
+        const menuLinks = document.querySelectorAll('.menu-link');
+        const mainContainer = document.getElementById('konten-utama');
+
+        // Fungsi Load Konten
+        async function loadContent(menuName) {
+            try {
+                // Mengambil file dari dalam folder "pages"
+                const response = await fetch(`pages/${menuName}.html`); 
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    
+                    // Extract scripts BEFORE setting innerHTML
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    const scripts = tempDiv.querySelectorAll('script');
+                    const scriptsContent = [];
+                    
+                    scripts.forEach(script => {
+                        scriptsContent.push({
+                            text: script.textContent,
+                            src: script.src
+                        });
+                    });
+                    
+                    // Set HTML without scripts first
+                    mainContainer.innerHTML = html;
+                    
+                    // Then execute scripts
+                    scriptsContent.forEach(scriptData => {
+                        const newScript = document.createElement('script');
+                        if (scriptData.src) {
+                            newScript.src = scriptData.src;
+                        } else {
+                            newScript.textContent = scriptData.text;
+                        }
+                        document.body.appendChild(newScript);
+                    });
+                } else {
+                    mainContainer.innerHTML = `
+                        <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; color: #e74c3c;">
+                            <h2><i class="fas fa-exclamation-triangle"></i> Halaman tidak ditemukan (404)</h2>
+                            <p>Pastikan file pages/${menuName}.html sudah ada.</p>
+                        </div>`;
+                }
+            } catch (error) {
+                mainContainer.innerHTML = `
+                    <div style="background: white; padding: 20px; border-radius: 8px; text-align: center;">
+                        <h2 style="color: #e74c3c;"><i class="fas fa-times-circle"></i> Gagal Memuat Halaman</h2>
+                        <p>Pastikan Anda membuka file ini menggunakan <b>Live Server</b> di VS Code, bukan sekadar klik dua kali file html.</p>
+                    </div>`;
+                console.error('Error fetching page:', error);
+            }
+        }
+
+        // Event Listener untuk Navigasi Menu
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault(); 
+                
+                menuLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                const menuName = this.getAttribute('data-menu');
+                loadContent(menuName);
+            });
+        });
+
+        // Load halaman pertama kali
+        loadContent('dashboard');
+    </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+{
+  "Lantai 1": [
+    {"kodeItem": "", "barcode": "", "namaItem": "Abrasive", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Aki", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Alat Tembak Paku Beton", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Amplas", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Benang Kapur", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Body TKO", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Bracket TV", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Charger", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Cutter", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Filter Air", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Handle Pintu", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Helm", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Inverator", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Jarum Karung", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Kap Lampu", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Karet", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Kawat Duri", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Kikir", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Korek Api", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Kran Dispenser", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Kunci Gurinda", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Kunci Sock Set", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Lot", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Mata Bor", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Mata Pisau", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Mata Shock", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "OB Dus Putih", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Pelampung Tandon", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Pemantik Gas", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "penutup Pintu", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Penyiram Tanaman", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Perlengkapan Mesin Cuci", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Pompa", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Seal", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Sekrup", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Selang Bak Cuci Piring", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Skun", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Solder", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Sparepart Elektronik", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Sparepart", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Spray Pembersih", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Sumpel Bak", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Timah Solder", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0}
+  ],
+  "Lantai 2": [
+    {"kodeItem": "", "barcode": "", "namaItem": "AC", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Bantal", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Blender", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Dispenser", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Freezer", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Gantungan", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Kipas", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Kompor", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Kulkas", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Kursi", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Laci", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Lemari", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Meja", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Mesin Cuci", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Mixer", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Oven", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Panci", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Pemanas Stainless", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Rak", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Rice Cooker", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Sandwich Maker", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Setrika", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Sofa", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Speaker", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Spring bed", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Tempat Beras", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "TV", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Vacuum", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0}
+  ],
+  "Lantai 2 Teras": [
+    {"kodeItem": "", "barcode": "", "namaItem": "Jemuran", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Karpet", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Keset", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Plastik", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Tangga", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Taplak Meja", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0},
+    {"kodeItem": "", "barcode": "", "namaItem": "Tikar", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0}
+  ],
+  "Lorong A": {
+    "Cat Semprot": [
+      {"kodeItem": "", "barcode": "", "namaItem": "Diton", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0}
+    ],
+    "Kabel": [
+      {"kodeItem": "", "barcode": "", "namaItem": "Kabel Audio", "hargaPokok": 0, "kodeBarang": "", "hargaJual": 0, "stok": 0}
+    ],
+    "Lampu": {
+      "Downlight": [],
+      "Lampu Panel": [],
+      "Lampu Sensor": [],
+      "Lampu Sorot": [],
+      "Lampu Tabung": []
+    },
+    "Saklar": [],
+    "Terminal": {
+      "Terminal Kabel": {
+        "Dexicon": []
+      }
+    }
+  },
+  "Lorong B": {
+    "V-Belt": []
+  },
+  "Sparepart": {
+    "STIHL": []
+  },
+  "Toho": []
+}

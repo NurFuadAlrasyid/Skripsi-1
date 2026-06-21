@@ -1,0 +1,237 @@
+<style>
+    .stok-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .stok-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .stok-header h2 {
+        color: #333;
+        font-size: 24px;
+    }
+
+    .stok-header button {
+        background: #7a5032;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s;
+    }
+
+    .stok-header button:hover {
+        background: #5c3d26;
+    }
+
+    .accordion-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .accordion-item {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f9f9f9;
+    }
+
+    .accordion-header {
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #7a5032 0%, #9e6d12 100%);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        user-select: none;
+        transition: all 0.3s;
+    }
+
+    .accordion-header:hover {
+        background: linear-gradient(135deg, #5c3d26 0%, #7a5032 100%);
+    }
+
+    .accordion-header.active {
+        background: linear-gradient(135deg, #5c3d26 0%, #7a5032 100%);
+    }
+
+    .accordion-header i {
+        transition: transform 0.3s;
+    }
+
+    .accordion-header.active i {
+        transform: rotate(180deg);
+    }
+
+    .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        background: white;
+    }
+
+    .accordion-content.active {
+        max-height: 2000px;
+    }
+
+    .table-wrapper {
+        padding: 15px;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    table thead {
+        background: #f0f0f0;
+    }
+
+    table th {
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #ddd;
+    }
+
+    table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+    }
+
+    table tbody tr:hover {
+        background: #f9f9f9;
+    }
+
+    .stok-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .stok-tinggi {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .stok-sedang {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .stok-rendah {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    code {
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+    }
+</style>
+
+<div class="stok-container">
+    <div class="stok-header">
+        <h2><i class="fas fa-boxes" style="color: #7a5032;"></i> Manajemen Stok</h2>
+        <button><i class="fas fa-plus"></i> Tambah Barang</button>
+    </div>
+    <div id="accordion-container" class="accordion-container">
+        <p style="text-align: center; color: #999;">Memuat data...</p>
+    </div>
+</div>
+
+<script>
+    // Inline functions
+    const formatRupiah = (angka) => {
+        if (!angka || isNaN(angka)) return 'Rp 0';
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(angka);
+    };
+
+    const getStokBadge = (stok) => {
+        if (!stok) stok = 0;
+        if (stok > 20) return `<span class="stok-badge stok-tinggi">Stok: ${stok}</span>`;
+        if (stok > 5) return `<span class="stok-badge stok-sedang">Stok: ${stok}</span>`;
+        return `<span class="stok-badge stok-rendah">Stok: ${stok}</span>`;
+    };
+
+    const buatTabel = (barang) => {
+        if (!Array.isArray(barang) || barang.length === 0) {
+            return '<div style="padding: 20px; text-align: center; color: #999;">Tidak ada barang</div>';
+        }
+
+        let html = `<div class="table-wrapper"><table><thead><tr><th>Kode</th><th>Barcode</th><th>Nama</th><th>Harga Pokok</th><th>Harga Jual</th><th>Stok</th></tr></thead><tbody>`;
+        barang.forEach(item => {
+            html += `<tr><td>${item.kodeItem || '-'}</td><td><code>${item.barcode || '-'}</code></td><td>${item.namaItem || '-'}</td><td>${formatRupiah(item.hargaPokok)}</td><td>${formatRupiah(item.hargaJual)}</td><td>${getStokBadge(item.stok)}</td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+        return html;
+    };
+
+    const renderAccordionItem = (nama, data, level = 0) => {
+        const classActive = level === 0 ? 'accordion-item' : 'accordion-item';
+        const headerClass = level === 0 ? 'accordion-header' : 'accordion-header';
+        const contentClass = level === 0 ? 'accordion-content' : 'accordion-content';
+
+        if (Array.isArray(data)) {
+            return `<div class="${classActive}"><div class="${headerClass}" onclick="toggleAccordion(this)"><span>${nama}</span><i class="fas fa-chevron-down"></i></div><div class="${contentClass}">${buatTabel(data)}</div></div>`;
+        } else if (typeof data === 'object' && data !== null) {
+            let subItemsHtml = '';
+            for (const [subNama, subData] of Object.entries(data)) {
+                subItemsHtml += renderAccordionItem(subNama, subData, level + 1);
+            }
+            return `<div class="${classActive}"><div class="${headerClass}" onclick="toggleAccordion(this)"><span>${nama}</span><i class="fas fa-chevron-down"></i></div><div class="${contentClass}"><div style="padding: 15px;">${subItemsHtml}</div></div></div>`;
+        }
+        return '';
+    };
+
+    // Global toggle function
+    window.toggleAccordion = function(header) {
+        header.classList.toggle('active');
+        const content = header.nextElementSibling;
+        content.classList.toggle('active');
+    };
+
+    // Load data immediately
+    (async () => {
+        try {
+            const response = await fetch('../../data.json');
+            if (!response.ok) throw new Error('Cannot load data');
+            
+            const data = await response.json();
+            const container = document.getElementById('accordion-container');
+            let html = '';
+
+            for (const [lokasi, barang] of Object.entries(data)) {
+                html += renderAccordionItem(lokasi, barang);
+            }
+
+            container.innerHTML = html;
+        } catch (error) {
+            document.getElementById('accordion-container').innerHTML = `<div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px;"><strong>Error:</strong> ${error.message}</div>`;
+        }
+    })();
+</script>
