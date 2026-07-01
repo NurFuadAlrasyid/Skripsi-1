@@ -14,34 +14,42 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
+            background:
+                radial-gradient(circle at top right, rgba(215, 174, 117, 0.18), transparent 28%),
+                linear-gradient(180deg, #fbf7f1 0%, #f5efe7 100%);
+            color: #2f3136;
         }
 
-        /* Header Styling */
-        header {
-            background: linear-gradient(135deg, #7a5032 100%);
-            padding: 15px 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .app-shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #6a4328 0%, #4a2d1a 100%);
+            color: #ffffff;
+            padding: 24px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
             position: sticky;
             top: 0;
-            z-index: 100;
+            height: 100vh;
+            box-shadow: 18px 0 38px rgba(70, 40, 18, 0.16);
         }
 
-        .header-container {
-            width: 100%;
-            padding-left: 20px;
-            padding-right: 20px;
+        .sidebar-header {
             display: flex;
             align-items: center;
-            gap: 20px;
-            justify-content: space-between;
+            gap: 14px;
+            padding: 8px 10px;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
             gap: 15px;
-            flex-shrink: 0;
         }
 
         .logo-section img {
@@ -52,7 +60,7 @@
         .header-text {
             display: flex;
             flex-direction: column;
-            flex-shrink: 0;
+            gap: 2px;
         }
 
         .header-title {
@@ -68,33 +76,41 @@
             color: #ffffff;
         }
 
-        /* Header Menu Styling */
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
         .header-menu {
             list-style: none;
             display: flex;
-            gap: 15px;
-            align-items: center;
-            flex: 1;
-            justify-content: center; 
+            flex-direction: column;
+            gap: 10px;
             margin: 0;
             padding: 0;
-            flex-wrap: wrap;
+        }
+
+        .header-menu li {
+            width: 100%;
         }
 
         .header-menu a {
             color: #ffffff;
             text-decoration: none;
             font-weight: 500;
-            font-size: 14px;
-            padding: 10px 20px;
-            border-radius: 25px;
+            font-size: 15px;
+            padding: 14px 16px;
+            border-radius: 14px;
             transition: all 0.3s ease;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            background-color: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            width: 100%;
         }
 
         .header-menu a i {
@@ -104,10 +120,10 @@
         }
 
         .header-menu a:hover {
-            background-color: rgba(52, 152, 219, 0.3);
-            border-color: #db9334;
+            background-color: rgba(255, 255, 255, 0.14);
+            border-color: rgba(219, 147, 52, 0.6);
             color: #ffffff;
-            transform: translateY(-2px);
+            transform: translateX(3px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
@@ -118,20 +134,18 @@
             box-shadow: 0 4px 12px rgba(97, 70, 7, 0.4);
         }
 
-        /* Profile Section Styling */
         .profile-section {
             display: flex;
             align-items: center;
             gap: 12px;
-            flex-shrink: 0;
             cursor: pointer;
             transition: all 0.3s ease;
             padding: 8px 12px;
-            border-radius: 6px;
+            border-radius: 14px;
         }
 
         .profile-section:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.08);
         }
 
         .profile-avatar {
@@ -168,49 +182,248 @@
             font-size: 12px;
         }
 
-        /* Area Konten Utama */
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            line-height: 1.6;
+        }
+
+        .sidebar-footer strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .sidebar-footer p,
+        .sidebar-footer small {
+            color: rgba(255, 255, 255, 0.74);
+        }
+
+        .content-area {
+            min-width: 0;
+            padding: 22px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 22px;
+            background: rgba(255, 255, 255, 0.86);
+            border: 1px solid rgba(122, 80, 50, 0.1);
+            border-radius: 22px;
+            box-shadow: 0 18px 35px rgba(122, 80, 50, 0.08);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 18px;
+            z-index: 50;
+        }
+
+        .content-header-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .content-header-title button {
+            display: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 1px solid #eadfd2;
+            background: #fffaf4;
+            color: #7a5032;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .content-page-name {
+            font-size: 30px;
+            font-weight: 700;
+            color: #2d2f35;
+        }
+
+        .content-page-subtitle {
+            color: #8b7768;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .content-header-tools {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .content-datetime {
+            text-align: right;
+            color: #5f6670;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .page-body {
+            padding-top: 22px;
+        }
+
         main {
-            padding: 20px;
-            max-width: 1200px;
+            max-width: 1320px;
             margin: 0 auto;
+        }
+
+        @media (max-width: 980px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                inset: 0 auto 0 0;
+                width: 270px;
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+                z-index: 200;
+            }
+
+            .sidebar.is-open {
+                transform: translateX(0);
+            }
+
+            .content-header-title button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .content-header {
+                top: 12px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .content-header-tools {
+                justify-content: space-between;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .content-area {
+                padding: 14px;
+            }
+
+            .content-page-name {
+                font-size: 24px;
+            }
+
+            .content-header-tools {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .content-datetime {
+                text-align: left;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <div class="logo-section">
-                <img src="Logo_Enrekang_Elektronik.png" alt="Logo">
+    <div class="app-shell">
+        <aside class="sidebar" id="app-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <img src="Logo_Enrekang_Elektronik.png" alt="Logo">
+                </div>
+                <div class="header-text">
+                    <h1 class="header-title">Enrekang <span>Elektronik</span></h1>
+                </div>
             </div>
-            <div class="header-text">
-                <h1 class="header-title">Enrekang <span>Elektronik</span></h1>
-            </div>
+
             <ul class="header-menu">
-                <li><a href="#" class="menu-link active" data-menu="dashboard"><i class="fas fa-th-large"></i>Dashboard</a></li>
-                <li><a href="#" class="menu-link" data-menu="stok"><i class="fas fa-boxes"></i>Stok</a></li>
-                <li><a href="#" class="menu-link" data-menu="penjualan"><i class="fas fa-shopping-cart"></i>Penjualan</a></li>
-                <li><a href="#" class="menu-link" data-menu="transaksi"><i class="fas fa-exchange-alt"></i>Transaksi</a></li>
-                <li><a href="#" class="menu-link" data-menu="laporan"><i class="fas fa-chart-bar"></i>Laporan</a></li>
+                <li><a href="#" class="menu-link active" data-menu="dashboard" data-title="Dashboard" data-subtitle="Ringkasan performa toko hari ini"><i class="fas fa-th-large"></i>Dashboard</a></li>
+                <li><a href="#" class="menu-link" data-menu="stok" data-title="Stok" data-subtitle="Pantau dan telusuri seluruh persediaan barang"><i class="fas fa-boxes"></i>Stok</a></li>
+                <li><a href="#" class="menu-link" data-menu="penjualan" data-title="Penjualan" data-subtitle="Catat transaksi kasir dan kelola pembayaran"><i class="fas fa-shopping-cart"></i>Penjualan</a></li>
+                <li><a href="#" class="menu-link" data-menu="laporan" data-title="Laporan" data-subtitle="Lihat omzet, laba, dan barang terlaris"><i class="fas fa-chart-bar"></i>Laporan</a></li>
+                <li><a href="#" class="menu-link" data-menu="pengaturan" data-title="Pengaturan" data-subtitle="Atur preferensi sistem dan informasi toko"><i class="fas fa-gear"></i>Pengaturan</a></li>
             </ul>
-            <div class="profile-section">
-                <div class="profile-avatar">
-                    <img src="foto_profil.png" alt="Profile Avatar">
+
+            <div class="sidebar-footer">
+                <strong>Toko Enrekang Elektronik</strong>
+                <p>Jl. Industri, Juppandang, Kec. Enrekang, Kabupaten Enrekang, Sulawesi Selatan 91711</p>
+                <small>&copy; 2026 All Rights Reserved</small>
+            </div>
+        </aside>
+
+        <div class="content-area">
+            <header class="content-header">
+                <div class="content-header-title">
+                    <button id="sidebar-toggle" type="button" aria-label="Buka menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div>
+                        <div id="content-page-name" class="content-page-name">Dashboard</div>
+                        <div id="content-page-subtitle" class="content-page-subtitle">Ringkasan performa toko hari ini</div>
+                    </div>
                 </div>
-                <div class="profile-info">
-                    <div class="profile-name">Alif Batara Radja</div>
-                    <div class="profile-role">Product Manager</div>
+
+                <div class="content-header-tools">
+                    <div id="content-datetime" class="content-datetime"></div>
+
+                    <div class="profile-section">
+                        <div class="profile-avatar">
+                            <img src="foto_profil.png" alt="Profile Avatar">
+                        </div>
+                        <div class="profile-info">
+                            <div class="profile-name" style="color:#2f3136;">Alif Batara Radja</div>
+                            <div class="profile-role" style="color:#7d6f61;">Admin</div>
+                        </div>
+                    </div>
                 </div>
+            </header>
+
+            <div class="page-body">
+                <main id="konten-utama">
+                    <h3>Memuat data...</h3>
+                </main>
             </div>
         </div>
-    </header>
-
-    <main id="konten-utama">
-        <h3>Memuat data...</h3>
-    </main>
+    </div>
 
     <script>
         const menuLinks = document.querySelectorAll('.menu-link');
         const mainContainer = document.getElementById('konten-utama');
+        const pageName = document.getElementById('content-page-name');
+        const pageSubtitle = document.getElementById('content-page-subtitle');
+        const dateTimeElement = document.getElementById('content-datetime');
+        const sidebar = document.getElementById('app-sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+
+        function updateDateTime() {
+            const now = new Date();
+            const dateText = new Intl.DateTimeFormat('id-ID', {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            }).format(now);
+
+            const timeText = new Intl.DateTimeFormat('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZoneName: 'short'
+            }).format(now);
+
+            dateTimeElement.innerHTML = `${dateText}<br>${timeText}`;
+        }
+
+        function setActivePage(link) {
+            pageName.textContent = link.dataset.title || link.textContent.trim();
+            pageSubtitle.textContent = link.dataset.subtitle || '';
+        }
 
         // Fungsi Load Konten
         async function loadContent(menuName) {
@@ -236,17 +449,26 @@
                     
                     // Set HTML without scripts first
                     mainContainer.innerHTML = html;
+
+                    document.querySelectorAll('script[data-dynamic-page-script="true"]').forEach(script => script.remove());
                     
-                    // Then execute scripts
-                    scriptsContent.forEach(scriptData => {
+                    // Then execute scripts sequentially so inline code can depend on external files.
+                    for (const scriptData of scriptsContent) {
                         const newScript = document.createElement('script');
+                        newScript.dataset.dynamicPageScript = 'true';
+
                         if (scriptData.src) {
-                            newScript.src = scriptData.src;
+                            await new Promise((resolve, reject) => {
+                                newScript.src = scriptData.src;
+                                newScript.onload = resolve;
+                                newScript.onerror = () => reject(new Error(`Gagal memuat script: ${scriptData.src}`));
+                                document.body.appendChild(newScript);
+                            });
                         } else {
                             newScript.textContent = scriptData.text;
+                            document.body.appendChild(newScript);
                         }
-                        document.body.appendChild(newScript);
-                    });
+                    }
                 } else {
                     mainContainer.innerHTML = `
                         <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; color: #e74c3c;">
@@ -271,13 +493,23 @@
                 
                 menuLinks.forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
+                setActivePage(this);
+                sidebar.classList.remove('is-open');
                 
                 const menuName = this.getAttribute('data-menu');
                 loadContent(menuName);
             });
         });
 
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('is-open');
+        });
+
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+
         // Load halaman pertama kali
+        setActivePage(document.querySelector('.menu-link.active'));
         loadContent('dashboard');
     </script>
 </body>

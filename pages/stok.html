@@ -1,237 +1,1276 @@
 <style>
-    .stok-container {
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    .stok-shell {
+        display: grid;
+        gap: 20px;
+        max-width: 1320px;
+        margin: 0 auto;
+        min-width: 0;
     }
 
-    .stok-header {
+    .stok-card,
+    .stok-panel {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid rgba(122, 80, 50, 0.08);
+        box-shadow: 0 18px 35px rgba(122, 80, 50, 0.08);
+        min-width: 0;
+    }
+
+    .stok-overview {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(185px, 1fr));
+        gap: 16px;
+    }
+
+    .stok-card {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: start;
+        min-height: 148px;
+    }
+
+    .stok-card h3 {
+        color: #6b6f78;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .stok-card strong {
+        display: block;
+        color: #20242a;
+        font-size: 28px;
+        line-height: 1.1;
+    }
+
+    .stok-card span,
+    .stok-card small {
+        color: #7e858f;
+        display: block;
+        margin-top: 6px;
+        font-size: 11px;
+    }
+
+    .stok-card-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .stok-card-link {
+        margin-top: 12px;
+        border: none;
+        background: transparent;
+        color: #8c562f;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .stok-insight-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(290px, 0.95fr) minmax(320px, 1fr);
+        gap: 20px;
+        align-items: start;
+    }
+
+    .stok-panel {
+        padding: 20px;
+    }
+
+    .stok-panel.chart-panel {
+        min-height: 360px;
+    }
+
+    .stok-panel.compact-panel {
+        min-height: 360px;
+    }
+
+    .stok-panel-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 25px;
+        gap: 12px;
+        margin-bottom: 18px;
     }
 
-    .stok-header h2 {
-        color: #333;
-        font-size: 24px;
+    .stok-panel-head h2 {
+        color: #2b2f35;
+        font-size: 18px;
     }
 
-    .stok-header button {
-        background: #7a5032;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background 0.3s;
+    .stok-panel-head h3 {
+        color: #2b2f35;
+        font-size: 18px;
     }
 
-    .stok-header button:hover {
-        background: #5c3d26;
+    .stok-select,
+    .stok-toolbar input,
+    .stok-toolbar select {
+        border: 1px solid #ddd4ca;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font: inherit;
+        background: #fffdf9;
+        color: #4f5560;
+        font-size: 13px;
     }
 
-    .accordion-container {
+    .stok-chart-layout {
+        display: grid;
+        grid-template-columns: 230px minmax(0, 1fr);
+        gap: 18px;
+        align-items: center;
+    }
+
+    .stok-donut {
+        width: 180px;
+        height: 180px;
+        margin: 0 auto;
+        border-radius: 50%;
+        position: relative;
+        background: conic-gradient(#dcd8d2 0deg 360deg);
+    }
+
+    .stok-donut::after {
+        content: '';
+        position: absolute;
+        inset: 30px;
+        border-radius: 50%;
+        background: #ffffff;
+        box-shadow: inset 0 0 0 1px rgba(122, 80, 50, 0.06);
+    }
+
+    .stok-donut-label {
+        position: absolute;
+        inset: 0;
         display: flex;
         flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .stok-donut-label strong {
+        font-size: 26px;
+        color: #20242a;
+    }
+
+    .stok-donut-label span {
+        color: #838894;
+        font-size: 11px;
+    }
+
+    .stok-legend {
+        display: grid;
+        gap: 14px;
+        max-height: 300px;
+        overflow: auto;
+        padding-right: 6px;
+    }
+
+    .stok-legend-item {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        color: #4d535e;
+        font-size: 12px;
+    }
+
+    .stok-legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .stok-mini-list,
+    .stok-activity-list {
+        display: grid;
+        gap: 14px;
+    }
+
+    .stok-mini-item,
+    .stok-activity-item {
+        display: grid;
         gap: 10px;
+        align-items: center;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #f0e5da;
     }
 
-    .accordion-item {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        overflow: hidden;
-        background: #f9f9f9;
+    .stok-mini-item:last-child,
+    .stok-activity-item:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
     }
 
-    .accordion-header {
-        padding: 15px 20px;
-        background: linear-gradient(135deg, #7a5032 0%, #9e6d12 100%);
-        color: white;
+    .stok-mini-item {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+
+    .stok-mini-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        background: #f4efea;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #81614c;
+        font-size: 13px;
+    }
+
+    .stok-mini-copy strong,
+    .stok-activity-copy strong {
+        display: block;
+        color: #20242a;
+        margin-bottom: 4px;
+        font-size: 12px;
+    }
+
+    .stok-mini-copy small,
+    .stok-activity-copy small {
+        color: #7e858f;
+        font-size: 10px;
+    }
+
+    .stok-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .stok-pill.low {
+        background: #fdeceb;
+        color: #b64136;
+    }
+
+    .stok-pill.medium {
+        background: #fff1d9;
+        color: #b8740c;
+    }
+
+    .stok-pill.high {
+        background: #e8f7ee;
+        color: #1d7c46;
+    }
+
+    .stok-activity-item {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+
+    .stok-activity-time {
+        color: #6f7680;
+        font-size: 11px;
+        min-width: 46px;
+    }
+
+    .stok-activity-qty.positive {
+        color: #1d7c46;
+        font-weight: 700;
+    }
+
+    .stok-activity-qty.negative {
+        color: #c14b41;
+        font-weight: 700;
+    }
+
+    .stok-message {
+        margin-top: 18px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: none;
+    }
+
+    .stok-message.success {
+        display: block;
+        background: #e8f7ee;
+        color: #1d7c46;
+        border: 1px solid #c4ebd3;
+    }
+
+    .stok-message.error {
+        display: block;
+        background: #fdeceb;
+        color: #b64136;
+        border: 1px solid #f7d0cd;
+    }
+
+    .stok-management {
+        padding: 20px;
+    }
+
+    .stok-toolbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 220px auto auto;
+        gap: 12px;
+        margin: 20px 0 16px;
+    }
+
+    .stok-button,
+    .stok-add-button,
+    .stok-pagination button {
+        border: none;
+        border-radius: 12px;
         cursor: pointer;
+        font: inherit;
+        font-weight: 600;
+    }
+
+    .stok-button,
+    .stok-add-button {
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+
+    .stok-button.primary,
+    .stok-add-button {
+        background: linear-gradient(135deg, #8a5a34, #a86c1d);
+        color: white;
+    }
+
+    .stok-button.secondary {
+        background: #fff7ee;
+        color: #7a5032;
+        border: 1px solid #ead8c3;
+    }
+
+    .stok-table-shell {
+        overflow-x: hidden;
+        border: 1px solid #efe4d7;
+        border-radius: 16px;
+        max-width: 100%;
+    }
+
+    .stok-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .stok-table col.code {
+        width: 8%;
+    }
+
+    .stok-table col.barcode {
+        width: 10%;
+    }
+
+    .stok-table col.name {
+        width: 24%;
+    }
+
+    .stok-table col.category {
+        width: 11%;
+    }
+
+    .stok-table col.stock {
+        width: 9%;
+    }
+
+    .stok-table col.cost,
+    .stok-table col.price {
+        width: 11%;
+    }
+
+    .stok-table col.location {
+        width: 8%;
+    }
+
+    .stok-table col.actions {
+        width: 18%;
+    }
+
+    .stok-table thead {
+        background: #f7f3ee;
+    }
+
+    .stok-table th,
+    .stok-table td {
+        padding: 10px 8px;
+        text-align: left;
+        border-bottom: 1px solid #f1e7dc;
+        vertical-align: middle;
+        font-size: 11px;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .stok-table th {
+        color: #7d6858;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .stok-table tbody tr:hover {
+        background: #fffaf4;
+    }
+
+    .stok-table td:last-child {
+        width: auto;
+    }
+
+    .stok-code {
+        background: #f0f0f0;
+        padding: 2px 5px;
+        border-radius: 6px;
+        font-family: 'Courier New', monospace;
+        font-size: 10px;
+        color: #5f6670;
+        display: inline-block;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .stok-name {
+        color: #20242a;
+        font-weight: 600;
+        font-size: 11px;
+        line-height: 1.3;
+    }
+
+    .stok-subtext {
+        color: #8a9099;
+        font-size: 10px;
+        margin-top: 3px;
+    }
+
+    .stok-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .stok-table .stok-pill {
+        white-space: normal;
+        text-align: center;
+    }
+
+    .stok-action-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        border: 1px solid #ead8c3;
+        background: #fff7ee;
+        color: #8a5a34;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .stok-action-icon.delete {
+        background: #fff1f0;
+        color: #c65348;
+        border-color: #f0c8c4;
+    }
+
+    .stok-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-weight: 600;
-        user-select: none;
-        transition: all 0.3s;
+        gap: 12px;
+        margin-top: 16px;
+        color: #717986;
+        font-size: 11px;
     }
 
-    .accordion-header:hover {
-        background: linear-gradient(135deg, #5c3d26 0%, #7a5032 100%);
+    .stok-pagination {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        max-width: 100%;
     }
 
-    .accordion-header.active {
-        background: linear-gradient(135deg, #5c3d26 0%, #7a5032 100%);
+    .stok-pagination button {
+        min-width: 30px;
+        height: 30px;
+        background: #fff7ee;
+        color: #7a5032;
+        border: 1px solid #ead8c3;
+        font-size: 11px;
     }
 
-    .accordion-header i {
-        transition: transform 0.3s;
+    .stok-pagination button.nav {
+        min-width: 34px;
+        padding: 0 8px;
+        font-weight: 700;
     }
 
-    .accordion-header.active i {
-        transform: rotate(180deg);
+    .stok-pagination button.hidden {
+        display: none;
     }
 
-    .accordion-content {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
-        background: white;
+    .stok-pagination button.active {
+        background: linear-gradient(135deg, #8a5a34, #a86c1d);
+        color: white;
+        border-color: transparent;
     }
 
-    .accordion-content.active {
-        max-height: 2000px;
+    .stok-empty {
+        padding: 30px 18px;
+        text-align: center;
+        color: #8a9099;
     }
 
-    .table-wrapper {
-        padding: 15px;
-        overflow-x: auto;
+    @media (max-width: 1240px) {
+        .stok-overview {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .stok-insight-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stok-table col.code {
+            width: 8%;
+        }
+
+        .stok-table col.barcode {
+            width: 10%;
+        }
+
+        .stok-table col.name {
+            width: 22%;
+        }
+
+        .stok-table col.category {
+            width: 10%;
+        }
+
+        .stok-table col.stock {
+            width: 9%;
+        }
+
+        .stok-table col.cost,
+        .stok-table col.price {
+            width: 11%;
+        }
+
+        .stok-table col.location {
+            width: 8%;
+        }
+
+        .stok-table col.actions {
+            width: 22%;
+        }
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
+    @media (max-width: 900px) {
+        .stok-toolbar {
+            grid-template-columns: 1fr;
+        }
+
+        .stok-chart-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .stok-panel.chart-panel,
+        .stok-panel.compact-panel {
+            min-height: auto;
+        }
+
+        .stok-table th,
+        .stok-table td {
+            padding: 12px 8px;
+            font-size: 12px;
+        }
+
+        .stok-table col.code {
+            width: 9%;
+        }
+
+        .stok-table col.barcode {
+            width: 11%;
+        }
+
+        .stok-table col.name {
+            width: 20%;
+        }
+
+        .stok-table col.category {
+            width: 10%;
+        }
+
+        .stok-table col.stock {
+            width: 9%;
+        }
+
+        .stok-table col.cost,
+        .stok-table col.price {
+            width: 11%;
+        }
+
+        .stok-table col.location {
+            width: 7%;
+        }
+
+        .stok-table col.actions {
+            width: 23%;
+        }
     }
 
-    table thead {
-        background: #f0f0f0;
-    }
+    @media (max-width: 640px) {
+        .stok-overview {
+            grid-template-columns: 1fr;
+        }
 
-    table th {
-        padding: 12px;
-        text-align: left;
-        font-weight: 600;
-        color: #333;
-        border-bottom: 2px solid #ddd;
-    }
-
-    table td {
-        padding: 12px;
-        border-bottom: 1px solid #eee;
-    }
-
-    table tbody tr:hover {
-        background: #f9f9f9;
-    }
-
-    .stok-badge {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .stok-tinggi {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .stok-sedang {
-        background: #fff3cd;
-        color: #856404;
-    }
-
-    .stok-rendah {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-    code {
-        background: #f0f0f0;
-        padding: 2px 6px;
-        border-radius: 3px;
-        font-family: 'Courier New', monospace;
-        font-size: 13px;
+        .stok-footer {
+            flex-direction: column;
+            align-items: flex-start;
+        }
     }
 </style>
 
-<div class="stok-container">
-    <div class="stok-header">
-        <h2><i class="fas fa-boxes" style="color: #7a5032;"></i> Manajemen Stok</h2>
-        <button><i class="fas fa-plus"></i> Tambah Barang</button>
-    </div>
-    <div id="accordion-container" class="accordion-container">
-        <p style="text-align: center; color: #999;">Memuat data...</p>
-    </div>
+<div class="stok-shell">
+    <section id="stok-overview" class="stok-overview"></section>
+
+    <section class="stok-insight-grid">
+        <article class="stok-panel">
+            <div class="stok-panel-head">
+                <h2>Grafik Stok Per Kategori</h2>
+                <select id="stok-category-scope" class="stok-select">
+                    <option value="all">Semua Kategori</option>
+                    <option value="top5">Top 5 Kategori</option>
+                </select>
+            </div>
+            <div class="stok-chart-layout">
+                <div id="stok-donut" class="stok-donut">
+                    <div class="stok-donut-label">
+                        <strong>0</strong>
+                        <span>Item</span>
+                    </div>
+                </div>
+                <div id="stok-legend" class="stok-legend"></div>
+            </div>
+        </article>
+
+        <article id="stok-low-stock-panel" class="stok-panel">
+            <div class="stok-panel-head">
+                <h3>Stok Menipis</h3>
+            </div>
+            <div id="stok-low-stock-list" class="stok-mini-list"></div>
+        </article>
+
+        <article id="stok-activity-panel" class="stok-panel">
+            <div class="stok-panel-head">
+                <h3>Aktivitas Stok Terbaru</h3>
+            </div>
+            <div id="stok-activity-list" class="stok-activity-list"></div>
+        </article>
+    </section>
+
+    <section id="stok-management-panel" class="stok-panel stok-management">
+        <div class="stok-panel-head">
+            <h2>Manajemen Stok</h2>
+        </div>
+
+        <div class="stok-toolbar">
+            <input id="stock-search-input" type="text" placeholder="Cari nama barang, kode, barcode, atau lokasi...">
+            <select id="stock-category-filter">
+                <option value="all">Semua Kategori</option>
+            </select>
+            <button id="stock-search-button" type="button" class="stok-button primary"><i class="fas fa-search"></i> Cari</button>
+            <button id="stock-search-reset" type="button" class="stok-button secondary"><i class="fas fa-rotate-left"></i> Reset</button>
+        </div>
+
+        <div id="stock-search-message" class="stok-message"></div>
+        <div id="stock-table-wrapper" class="stok-table-shell"></div>
+        <div class="stok-footer">
+            <div id="stock-table-info"></div>
+            <div id="stock-pagination" class="stok-pagination"></div>
+        </div>
+    </section>
 </div>
 
+<script src="app-store.js?v=20260701"></script>
 <script>
-    // Inline functions
-    const formatRupiah = (angka) => {
-        if (!angka || isNaN(angka)) return 'Rp 0';
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0
-        }).format(angka);
-    };
+    (() => {
+        const store = window.EnrekangStore;
+        const state = {
+            items: [],
+            transactions: [],
+            stockActivities: [],
+            currentPage: 1,
+            pageSize: 20,
+            pageWindowSize: 10,
+            pageWindowStart: 1,
+            searchQuery: '',
+            categoryFilter: 'all',
+            chartScope: 'all'
+        };
 
-    const getStokBadge = (stok) => {
-        if (!stok) stok = 0;
-        if (stok > 20) return `<span class="stok-badge stok-tinggi">Stok: ${stok}</span>`;
-        if (stok > 5) return `<span class="stok-badge stok-sedang">Stok: ${stok}</span>`;
-        return `<span class="stok-badge stok-rendah">Stok: ${stok}</span>`;
-    };
+        const overviewContainer = document.getElementById('stok-overview');
+        const donutElement = document.getElementById('stok-donut');
+        const legendElement = document.getElementById('stok-legend');
+        const lowStockList = document.getElementById('stok-low-stock-list');
+        const activityList = document.getElementById('stok-activity-list');
+        const searchInput = document.getElementById('stock-search-input');
+        const searchButton = document.getElementById('stock-search-button');
+        const resetButton = document.getElementById('stock-search-reset');
+        const categoryFilter = document.getElementById('stock-category-filter');
+        const categoryScope = document.getElementById('stok-category-scope');
+        const messageBox = document.getElementById('stock-search-message');
+        const tableWrapper = document.getElementById('stock-table-wrapper');
+        const tableInfo = document.getElementById('stock-table-info');
+        const pagination = document.getElementById('stock-pagination');
 
-    const buatTabel = (barang) => {
-        if (!Array.isArray(barang) || barang.length === 0) {
-            return '<div style="padding: 20px; text-align: center; color: #999;">Tidak ada barang</div>';
-        }
+        const chartColors = ['#61c28b', '#ff7a33', '#f5c247', '#8b7be0', '#6da9e4', '#ef8fbb', '#4dc3c7', '#b89b7f'];
 
-        let html = `<div class="table-wrapper"><table><thead><tr><th>Kode</th><th>Barcode</th><th>Nama</th><th>Harga Pokok</th><th>Harga Jual</th><th>Stok</th></tr></thead><tbody>`;
-        barang.forEach(item => {
-            html += `<tr><td>${item.kodeItem || '-'}</td><td><code>${item.barcode || '-'}</code></td><td>${item.namaItem || '-'}</td><td>${formatRupiah(item.hargaPokok)}</td><td>${formatRupiah(item.hargaJual)}</td><td>${getStokBadge(item.stok)}</td></tr>`;
+        const formatRupiah = (angka) => {
+            if (!angka || isNaN(angka)) return 'Rp 0';
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(angka);
+        };
+
+        const escapeHtml = (value) => String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+        const formatNumber = (value) => new Intl.NumberFormat('id-ID').format(Number(value || 0));
+
+        const getCategoryLabel = (item) => {
+            const rawCategory = String(item.__kategori || '').split(' / ')[0].trim();
+            if (rawCategory) {
+                return rawCategory;
+            }
+            return String(item.__lokasi || 'Lainnya').trim() || 'Lainnya';
+        };
+
+        const getStatusClass = (stock) => {
+            const value = Number(stock || 0);
+            if (value <= 5) return 'low';
+            if (value <= 20) return 'medium';
+            return 'high';
+        };
+
+        const getStockBadge = (stock) => {
+            const value = Number(stock || 0);
+            const className = getStatusClass(value);
+            return `<span class="stok-pill ${className}">Stok: ${escapeHtml(String(value))}</span>`;
+        };
+
+        const setMessage = (message, type = 'success') => {
+            messageBox.className = `stok-message ${type}`;
+            messageBox.textContent = message;
+        };
+
+        const clearMessage = () => {
+            messageBox.className = 'stok-message';
+            messageBox.textContent = '';
+        };
+
+        const buildTopProduct = (transactions) => {
+            const byItem = {};
+            transactions.forEach((transaction) => {
+                transaction.items.forEach((item) => {
+                    if (!byItem[item.itemKey]) {
+                        byItem[item.itemKey] = {
+                            namaItem: item.namaItem,
+                            qty: 0
+                        };
+                    }
+                    byItem[item.itemKey].qty += Number(item.qty || 0);
+                });
+            });
+
+            return Object.values(byItem).sort((left, right) => right.qty - left.qty)[0] || null;
+        };
+
+        const buildCategoryStats = (items) => {
+            const totals = items.reduce((result, item) => {
+                const key = getCategoryLabel(item);
+                result[key] = (result[key] || 0) + 1;
+                return result;
+            }, {});
+
+            return Object.entries(totals)
+                .map(([name, count], index) => ({
+                    name,
+                    count,
+                    color: chartColors[index % chartColors.length]
+                }))
+                .sort((left, right) => right.count - left.count);
+        };
+
+        const getFilteredItems = () => {
+            const keyword = state.searchQuery.toLowerCase().trim();
+            return state.items.filter((item) => {
+                if (state.categoryFilter !== 'all' && getCategoryLabel(item) !== state.categoryFilter) {
+                    return false;
+                }
+
+                if (!keyword) {
+                    return true;
+                }
+
+                const searchable = [
+                    item.namaItem,
+                    item.kodeItem,
+                    item.barcode,
+                    item.__lokasi,
+                    item.__kategori,
+                    item.__path
+                ].join(' ').toLowerCase();
+
+                return searchable.includes(keyword);
+            });
+        };
+
+        const renderOverview = () => {
+            const lowStockItems = state.items.filter((item) => Number(item.currentStock || 0) > 0 && Number(item.currentStock || 0) <= 5);
+            const outOfStockItems = state.items.filter((item) => Number(item.currentStock || 0) <= 0);
+            const totalStockValue = state.items.reduce((sum, item) => sum + (Number(item.currentStock || 0) * Number(item.hargaJual || 0)), 0);
+            const topProduct = buildTopProduct(state.transactions);
+            const categories = buildCategoryStats(state.items);
+
+            overviewContainer.innerHTML = [
+                {
+                    title: 'Total Stok Produk',
+                    value: formatNumber(state.items.length),
+                    note: `${formatNumber(categories.length)} kategori aktif`,
+                    icon: 'fa-box',
+                    iconStyle: 'background:#f6eee3;color:#8a5a34;',
+                    target: 'stok-management-panel'
+                },
+                {
+                    title: 'Nilai Total Stok',
+                    value: formatRupiah(totalStockValue),
+                    note: 'Perkiraan nilai jual',
+                    icon: 'fa-sack-dollar',
+                    iconStyle: 'background:#fff2d8;color:#ba7b12;',
+                    target: 'stok-management-panel'
+                },
+                {
+                    title: 'Stok Menipis',
+                    value: formatNumber(lowStockItems.length),
+                    note: 'Produk',
+                    icon: 'fa-triangle-exclamation',
+                    iconStyle: 'background:#fff3ef;color:#e16b34;',
+                    target: 'stok-low-stock-panel',
+                    link: 'Lihat detail'
+                },
+                {
+                    title: 'Stok Habis',
+                    value: formatNumber(outOfStockItems.length),
+                    note: 'Produk',
+                    icon: 'fa-circle-xmark',
+                    iconStyle: 'background:#fdeceb;color:#c85349;',
+                    target: 'stok-management-panel',
+                    link: 'Lihat detail'
+                },
+                {
+                    title: 'Produk Terlaris',
+                    value: topProduct ? escapeHtml(topProduct.namaItem) : 'Belum ada',
+                    note: topProduct ? `${formatNumber(topProduct.qty)} terjual` : 'Belum ada transaksi',
+                    icon: 'fa-award',
+                    iconStyle: 'background:#fff4dd;color:#cf8f14;',
+                    target: 'stok-activity-panel'
+                }
+            ].map((card) => `
+                <article class="stok-card">
+                    <div>
+                        <h3>${card.title}</h3>
+                        <strong>${card.value}</strong>
+                        <span>${card.note}</span>
+                        ${card.link ? `<button type="button" class="stok-card-link" data-scroll-target="${card.target}">${card.link} <i class="fas fa-arrow-right"></i></button>` : ''}
+                    </div>
+                    <div class="stok-card-icon" style="${card.iconStyle}"><i class="fas ${card.icon}"></i></div>
+                </article>
+            `).join('');
+        };
+
+        const renderCategoryChart = () => {
+            const stats = buildCategoryStats(state.items);
+            let scopedStats = state.chartScope === 'top5' ? stats.slice(0, 5) : stats;
+
+            if (state.chartScope === 'all' && stats.length > 6) {
+                const primary = stats.slice(0, 5);
+                const remainingCount = stats.slice(5).reduce((sum, item) => sum + item.count, 0);
+                scopedStats = primary.concat({
+                    name: 'Lainnya',
+                    count: remainingCount,
+                    color: '#d7c2ab'
+                });
+            }
+
+            const total = scopedStats.reduce((sum, item) => sum + item.count, 0) || 1;
+
+            let currentPercent = 0;
+            const segments = scopedStats.map((item) => {
+                const start = currentPercent;
+                const slice = (item.count / total) * 360;
+                currentPercent += slice;
+                return `${item.color} ${start}deg ${currentPercent}deg`;
+            });
+
+            donutElement.style.background = segments.length ? `conic-gradient(${segments.join(', ')})` : 'conic-gradient(#dcd8d2 0deg 360deg)';
+            donutElement.querySelector('.stok-donut-label').innerHTML = `<strong>${formatNumber(total)}</strong><span>Item</span>`;
+
+            legendElement.innerHTML = scopedStats.map((item) => `
+                <div class="stok-legend-item">
+                    <span class="stok-legend-color" style="background:${item.color};"></span>
+                    <span>${escapeHtml(item.name)}</span>
+                    <strong>${formatNumber(item.count)} Item</strong>
+                </div>
+            `).join('') || '<div class="stok-empty">Belum ada data kategori.</div>';
+        };
+
+        const renderLowStock = () => {
+            const lowItems = state.items
+                .filter((item) => Number(item.currentStock || 0) > 0 && Number(item.currentStock || 0) <= 5)
+                .sort((left, right) => Number(left.currentStock || 0) - Number(right.currentStock || 0) || String(left.namaItem || '').localeCompare(String(right.namaItem || '')))
+                .slice(0, 5);
+
+            if (!lowItems.length) {
+                lowStockList.innerHTML = '<div class="stok-empty">Tidak ada stok menipis saat ini.</div>';
+                return;
+            }
+
+            lowStockList.innerHTML = lowItems.map((item) => `
+                <div class="stok-mini-item">
+                    <span class="stok-mini-icon"><i class="fas fa-box-open"></i></span>
+                    <div class="stok-mini-copy">
+                        <strong>${escapeHtml(item.namaItem || '-')}</strong>
+                        <small>${escapeHtml(item.__lokasi || item.__kategori || '-')}</small>
+                    </div>
+                    <span class="stok-pill low">Stok: ${escapeHtml(String(item.currentStock || 0))}</span>
+                </div>
+            `).join('');
+        };
+
+        const renderActivities = () => {
+            const transactionActivities = state.transactions
+                .flatMap((transaction) => transaction.items.map((item) => ({
+                    kind: 'negative',
+                    createdAt: transaction.createdAt,
+                    time: store.formatDateTime(transaction.createdAt),
+                    label: 'Stok Keluar',
+                    name: item.namaItem,
+                    detail: transaction.invoiceNumber,
+                    qty: `-${formatNumber(item.qty)} pcs`
+                })));
+
+            const incomingActivities = state.stockActivities.map((activity) => ({
+                kind: 'positive',
+                createdAt: activity.createdAt,
+                time: store.formatDateTime(activity.createdAt),
+                label: 'Stok Masuk',
+                name: activity.namaItem,
+                detail: activity.lokasi || 'Penyesuaian lokal',
+                qty: `+${formatNumber(activity.quantity)} pcs`
+            }));
+
+            const activities = [...incomingActivities, ...transactionActivities]
+                .sort((left, right) => new Date(right.createdAt) - new Date(left.createdAt))
+                .slice(0, 5);
+
+            if (!activities.length) {
+                activityList.innerHTML = '<div class="stok-empty">Belum ada aktivitas stok terbaru.</div>';
+                return;
+            }
+
+            activityList.innerHTML = activities.map((activity) => `
+                <div class="stok-activity-item">
+                    <div class="stok-activity-time">${escapeHtml(activity.time)}</div>
+                    <div class="stok-activity-copy">
+                        <strong>${escapeHtml(activity.label)}: ${escapeHtml(activity.name || '-')}</strong>
+                        <small>${escapeHtml(activity.detail || '')}</small>
+                    </div>
+                    <div class="stok-activity-qty ${activity.kind}">${escapeHtml(activity.qty)}</div>
+                </div>
+            `).join('');
+        };
+
+        const renderCategoryOptions = () => {
+            const categories = buildCategoryStats(state.items).map((item) => item.name);
+            categoryFilter.innerHTML = `<option value="all">Semua Kategori</option>${categories.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')}`;
+            categoryFilter.value = state.categoryFilter;
+        };
+
+        const renderTable = () => {
+            const filteredItems = getFilteredItems();
+            const totalItems = filteredItems.length;
+            const totalPages = Math.max(1, Math.ceil(totalItems / state.pageSize));
+
+            if (state.currentPage > totalPages) {
+                state.currentPage = totalPages;
+            }
+
+            const startIndex = (state.currentPage - 1) * state.pageSize;
+            const visibleItems = filteredItems.slice(startIndex, startIndex + state.pageSize);
+            const from = totalItems ? startIndex + 1 : 0;
+            const to = startIndex + visibleItems.length;
+
+            const maxWindowStart = Math.max(1, totalPages - state.pageWindowSize + 1);
+            if (state.pageWindowStart > maxWindowStart) {
+                state.pageWindowStart = maxWindowStart;
+            }
+            if (state.currentPage < state.pageWindowStart) {
+                state.pageWindowStart = state.currentPage;
+            }
+            if (state.currentPage >= state.pageWindowStart + state.pageWindowSize) {
+                state.pageWindowStart = state.currentPage - state.pageWindowSize + 1;
+            }
+
+            if (!visibleItems.length) {
+                tableWrapper.innerHTML = '<div class="stok-empty">Tidak ada barang yang cocok dengan filter saat ini.</div>';
+            } else {
+                tableWrapper.innerHTML = `
+                    <table class="stok-table">
+                        <colgroup>
+                            <col class="code">
+                            <col class="barcode">
+                            <col class="name">
+                            <col class="category">
+                            <col class="stock">
+                            <col class="cost">
+                            <col class="price">
+                            <col class="location">
+                            <col class="actions">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Kode</th>
+                                <th>Barcode</th>
+                                <th>Nama Barang</th>
+                                <th>Kategori</th>
+                                <th>Stok</th>
+                                <th>Harga Pokok</th>
+                                <th>Harga Jual</th>
+                                <th>Lokasi</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${visibleItems.map((item) => `
+                                <tr>
+                                    <td>${escapeHtml(item.kodeItem || '-')}</td>
+                                    <td><span class="stok-code">${escapeHtml(item.barcode || '-')}</span></td>
+                                    <td>
+                                        <div class="stok-name">${escapeHtml(item.namaItem || '-')}</div>
+                                        <div class="stok-subtext">${escapeHtml(item.__path || '-')}</div>
+                                    </td>
+                                    <td>${escapeHtml(getCategoryLabel(item))}</td>
+                                    <td>${getStockBadge(item.currentStock)}</td>
+                                    <td>${escapeHtml(formatRupiah(item.hargaPokok))}</td>
+                                    <td>${escapeHtml(formatRupiah(item.hargaJual))}</td>
+                                    <td>${escapeHtml(item.__lokasi || '-')}</td>
+                                    <td>
+                                        <div class="stok-actions">
+                                            <button type="button" class="stok-action-icon" data-table-action="edit" data-item-name="${escapeHtml(item.namaItem || '-') }" title="Edit data visual">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+                                            <button type="button" class="stok-action-icon delete" data-table-action="delete" data-item-name="${escapeHtml(item.namaItem || '-') }" title="Hapus data visual">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button type="button" class="stok-add-button" data-item-key="${escapeHtml(item.__itemKey)}" data-item-name="${escapeHtml(item.namaItem || '-')}">Tambah Stok</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            tableInfo.textContent = `Menampilkan ${from} - ${to} dari ${formatNumber(totalItems)} data`;
+
+            const windowEnd = Math.min(totalPages, state.pageWindowStart + state.pageWindowSize - 1);
+            const prevHidden = state.pageWindowStart <= 1 ? 'hidden' : '';
+            const nextHidden = windowEnd >= totalPages ? 'hidden' : '';
+
+            pagination.innerHTML = `
+                <button type="button" class="nav ${prevHidden}" data-nav="prev-window" aria-label="Halaman sebelumnya">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                ${Array.from({ length: Math.max(0, windowEnd - state.pageWindowStart + 1) }, (_, index) => {
+                    const page = state.pageWindowStart + index;
+                    return `<button type="button" class="${page === state.currentPage ? 'active' : ''}" data-page="${page}">${page}</button>`;
+                }).join('')}
+                <button type="button" class="nav ${nextHidden}" data-nav="next-window" aria-label="Halaman selanjutnya">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+        };
+
+        const renderAll = () => {
+            renderOverview();
+            renderCategoryChart();
+            renderLowStock();
+            renderActivities();
+            renderCategoryOptions();
+            renderTable();
+        };
+
+        const refreshStockView = async () => {
+            const [items, transactions, stockActivities] = await Promise.all([
+                store.getEffectiveItems(),
+                Promise.resolve(store.getTransactions()),
+                Promise.resolve(store.getStockActivities())
+            ]);
+
+            state.items = items.sort((left, right) => String(left.namaItem || '').localeCompare(String(right.namaItem || '')));
+            state.transactions = transactions;
+            state.stockActivities = stockActivities;
+            renderAll();
+        };
+
+        const handleAddStock = async (button) => {
+            const itemKey = button.dataset.itemKey;
+            const itemName = button.dataset.itemName || 'barang';
+            const rawQty = window.prompt(`Tambah stok untuk ${itemName}. Masukkan jumlah stok tambahan:`);
+            if (rawQty === null) {
+                return;
+            }
+
+            const qty = Number(rawQty);
+
+            try {
+                await store.addStock(itemKey, qty);
+                setMessage(`Stok ${itemName} berhasil ditambah sebanyak ${qty}.`, 'success');
+                await refreshStockView();
+            } catch (error) {
+                setMessage(error.message, 'error');
+            }
+        };
+
+        searchButton.addEventListener('click', () => {
+            clearMessage();
+            state.searchQuery = searchInput.value;
+            state.currentPage = 1;
+            state.pageWindowStart = 1;
+            renderTable();
         });
-        html += `</tbody></table></div>`;
-        return html;
-    };
 
-    const renderAccordionItem = (nama, data, level = 0) => {
-        const classActive = level === 0 ? 'accordion-item' : 'accordion-item';
-        const headerClass = level === 0 ? 'accordion-header' : 'accordion-header';
-        const contentClass = level === 0 ? 'accordion-content' : 'accordion-content';
-
-        if (Array.isArray(data)) {
-            return `<div class="${classActive}"><div class="${headerClass}" onclick="toggleAccordion(this)"><span>${nama}</span><i class="fas fa-chevron-down"></i></div><div class="${contentClass}">${buatTabel(data)}</div></div>`;
-        } else if (typeof data === 'object' && data !== null) {
-            let subItemsHtml = '';
-            for (const [subNama, subData] of Object.entries(data)) {
-                subItemsHtml += renderAccordionItem(subNama, subData, level + 1);
+        searchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                clearMessage();
+                state.searchQuery = searchInput.value;
+                state.currentPage = 1;
+                state.pageWindowStart = 1;
+                renderTable();
             }
-            return `<div class="${classActive}"><div class="${headerClass}" onclick="toggleAccordion(this)"><span>${nama}</span><i class="fas fa-chevron-down"></i></div><div class="${contentClass}"><div style="padding: 15px;">${subItemsHtml}</div></div></div>`;
-        }
-        return '';
-    };
+        });
 
-    // Global toggle function
-    window.toggleAccordion = function(header) {
-        header.classList.toggle('active');
-        const content = header.nextElementSibling;
-        content.classList.toggle('active');
-    };
+        resetButton.addEventListener('click', () => {
+            clearMessage();
+            searchInput.value = '';
+            state.searchQuery = '';
+            state.categoryFilter = 'all';
+            categoryFilter.value = 'all';
+            state.currentPage = 1;
+            state.pageWindowStart = 1;
+            renderTable();
+        });
 
-    // Load data immediately
-    (async () => {
-        try {
-            const response = await fetch('../../data.json');
-            if (!response.ok) throw new Error('Cannot load data');
-            
-            const data = await response.json();
-            const container = document.getElementById('accordion-container');
-            let html = '';
+        categoryFilter.addEventListener('change', () => {
+            state.categoryFilter = categoryFilter.value;
+            state.currentPage = 1;
+            state.pageWindowStart = 1;
+            renderTable();
+        });
 
-            for (const [lokasi, barang] of Object.entries(data)) {
-                html += renderAccordionItem(lokasi, barang);
+        categoryScope.addEventListener('change', () => {
+            state.chartScope = categoryScope.value;
+            renderCategoryChart();
+        });
+
+        pagination.addEventListener('click', (event) => {
+            const navButton = event.target.closest('[data-nav]');
+            if (navButton) {
+                if (navButton.dataset.nav === 'prev-window') {
+                    state.pageWindowStart = Math.max(1, state.pageWindowStart - state.pageWindowSize);
+                    state.currentPage = Math.min(state.currentPage, state.pageWindowStart + state.pageWindowSize - 1);
+                }
+
+                if (navButton.dataset.nav === 'next-window') {
+                    const filteredItems = getFilteredItems();
+                    const totalPages = Math.max(1, Math.ceil(filteredItems.length / state.pageSize));
+                    state.pageWindowStart = Math.min(
+                        Math.max(1, totalPages - state.pageWindowSize + 1),
+                        state.pageWindowStart + state.pageWindowSize
+                    );
+                    if (state.currentPage < state.pageWindowStart) {
+                        state.currentPage = state.pageWindowStart;
+                    }
+                }
+
+                renderTable();
+                return;
             }
 
-            container.innerHTML = html;
-        } catch (error) {
-            document.getElementById('accordion-container').innerHTML = `<div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px;"><strong>Error:</strong> ${error.message}</div>`;
-        }
+            const button = event.target.closest('[data-page]');
+            if (!button) {
+                return;
+            }
+
+            state.currentPage = Number(button.dataset.page);
+            renderTable();
+        });
+
+        overviewContainer.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-scroll-target]');
+            if (!button) {
+                return;
+            }
+
+            const target = document.getElementById(button.dataset.scrollTarget);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        tableWrapper.addEventListener('click', (event) => {
+            const visualAction = event.target.closest('[data-table-action]');
+            if (visualAction) {
+                const action = visualAction.dataset.tableAction;
+                const itemName = visualAction.dataset.itemName || 'barang';
+                const label = action === 'edit' ? 'Edit' : 'Hapus';
+                setMessage(`${label} untuk ${itemName} ditampilkan sebagai aksi visual dan belum mengubah data stok.`, 'success');
+                return;
+            }
+
+            const button = event.target.closest('.stok-add-button');
+            if (button) {
+                handleAddStock(button);
+            }
+        });
+
+        window.addEventListener('enrekang-stock-data-updated', refreshStockView);
+
+        (async () => {
+            try {
+                await refreshStockView();
+            } catch (error) {
+                tableWrapper.innerHTML = `<div class="stok-empty"><strong>Error:</strong> ${escapeHtml(error.message)}</div>`;
+            }
+        })();
     })();
 </script>

@@ -1,15 +1,758 @@
-<div style="background-color: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-    <h2 style="color: #333; margin-bottom: 15px;"><i class="fas fa-th-large" style="color: #7a5032;"></i>Dashboard</h2>
-    <p style="color: #666; margin-bottom: 20px;">Selamat datang kembali! Berikut adalah ringkasan singkat sistem Anda hari ini.</p>
-    
-    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 200px; background: #e8f4f8; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db;">
-            <h4 style="color: #555; margin-bottom: 10px;">Total Barang</h4>
-            <h1 style="color: #2c3e50;">1,245</h1>
+<style>
+    .dashboard-shell {
+        display: grid;
+        gap: 20px;
+    }
+
+    .dashboard-metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .dashboard-card,
+    .dashboard-panel {
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 20px;
+        box-shadow: 0 18px 35px rgba(122, 80, 50, 0.08);
+        border: 1px solid rgba(122, 80, 50, 0.08);
+        backdrop-filter: blur(10px);
+    }
+
+    .dashboard-card {
+        padding: 22px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 16px;
+        align-items: start;
+        position: relative;
+        overflow: hidden;
+        cursor: default;
+    }
+
+    .dashboard-card.is-clickable {
+        cursor: pointer;
+    }
+
+    .dashboard-card.is-clickable:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 22px 40px rgba(122, 80, 50, 0.12);
+    }
+
+    .dashboard-card-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+    }
+
+    .dashboard-card h4 {
+        color: #5e6470;
+        font-size: 14px;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .dashboard-card strong {
+        display: block;
+        font-size: 34px;
+        color: #1f2329;
+        line-height: 1.1;
+    }
+
+    .dashboard-card span {
+        display: block;
+        margin-top: 8px;
+        color: #7c8189;
+        font-size: 13px;
+    }
+
+    .dashboard-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
+        gap: 20px;
+    }
+
+    .dashboard-column {
+        display: grid;
+        gap: 20px;
+    }
+
+    .dashboard-panel {
+        padding: 22px;
+    }
+
+    .dashboard-panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .dashboard-panel-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #2b160a, #704321);
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        margin-right: 10px;
+    }
+
+    .dashboard-panel-title {
+        display: flex;
+        align-items: center;
+        color: #2f3136;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .dashboard-panel-link {
+        border: none;
+        background: transparent;
+        color: #a5522d;
+        font-weight: 700;
+        cursor: pointer;
+        font: inherit;
+    }
+
+    .dashboard-chart-card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(249,243,235,0.92));
+    }
+
+    .dashboard-chart-header p,
+    .dashboard-low-stock-head p {
+        color: #7c8189;
+        margin-top: 6px;
+        font-size: 13px;
+    }
+
+    .dashboard-chart {
+        display: grid;
+        grid-template-columns: 56px minmax(0, 1fr);
+        gap: 14px;
+        align-items: stretch;
+        min-height: 250px;
+    }
+
+    .dashboard-axis {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: #9a8c7f;
+        font-size: 12px;
+        padding: 10px 0 34px;
+    }
+
+    .dashboard-plot {
+        position: relative;
+        display: grid;
+        grid-template-rows: 1fr 26px;
+    }
+
+    .dashboard-grid-lines {
+        position: absolute;
+        inset: 0 0 26px 0;
+        background-image: linear-gradient(to top, rgba(122, 80, 50, 0.08) 1px, transparent 1px), linear-gradient(to right, rgba(122, 80, 50, 0.05) 1px, transparent 1px);
+        background-size: 100% 20%, calc(100% / 12) 100%;
+        border-left: 1px solid rgba(122, 80, 50, 0.08);
+        border-bottom: 1px solid rgba(122, 80, 50, 0.08);
+        border-radius: 14px 14px 0 0;
+    }
+
+    .dashboard-chart-svg {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 224px;
+        overflow: visible;
+    }
+
+    .dashboard-chart-months {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        color: #8b7768;
+        font-size: 12px;
+        padding-top: 10px;
+    }
+
+    .dashboard-chart-months span {
+        text-align: center;
+    }
+
+    .dashboard-tooltip {
+        position: absolute;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        color: #2f3136;
+        border-radius: 12px;
+        padding: 10px 12px;
+        border: 1px solid #eadfd2;
+        box-shadow: 0 16px 30px rgba(47, 49, 54, 0.12);
+        font-size: 12px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .dashboard-tooltip.active {
+        opacity: 1;
+    }
+
+    .dashboard-product-list,
+    .dashboard-activity-list {
+        display: grid;
+        gap: 14px;
+    }
+
+    .dashboard-product-row,
+    .dashboard-activity-item {
+        display: grid;
+        gap: 12px;
+    }
+
+    .dashboard-product-row {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+    }
+
+    .dashboard-rank {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #f3efe9;
+        color: #786555;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .dashboard-rank.is-top {
+        background: #ffc84a;
+        color: #69410b;
+    }
+
+    .dashboard-product-meta {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 140px;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .dashboard-product-name {
+        color: #2f3136;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dashboard-progress {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: #f1e7dc;
+        overflow: hidden;
+    }
+
+    .dashboard-progress span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #8c562f, #6b3f1f);
+    }
+
+    .dashboard-product-value {
+        color: #5f6670;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .dashboard-alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: #fdeceb;
+        border: 1px solid #f7d0cd;
+        color: #b64136;
+        padding: 14px 16px;
+        border-radius: 14px;
+        margin-bottom: 18px;
+    }
+
+    .dashboard-low-stock-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .dashboard-low-stock-table th,
+    .dashboard-low-stock-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #eee3d8;
+        text-align: left;
+        vertical-align: top;
+        font-size: 14px;
+    }
+
+    .dashboard-low-stock-table th {
+        color: #725742;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .dashboard-stock-pill,
+    .dashboard-status-pill,
+    .dashboard-role-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .dashboard-stock-pill,
+    .dashboard-status-pill.warning {
+        background: #fff1d9;
+        color: #b8740c;
+    }
+
+    .dashboard-status-pill.danger {
+        background: #fdeceb;
+        color: #b64136;
+    }
+
+    .dashboard-activity-item {
+        grid-template-columns: auto auto minmax(0, 1fr) auto;
+        align-items: start;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #f0e5da;
+    }
+
+    .dashboard-activity-item:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .dashboard-activity-time {
+        color: #7d6f61;
+        font-size: 13px;
+        font-weight: 600;
+        min-width: 42px;
+    }
+
+    .dashboard-activity-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .dashboard-activity-copy strong {
+        color: #2f3136;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .dashboard-activity-copy small {
+        color: #7d6f61;
+    }
+
+    .dashboard-role-pill {
+        background: #eef2f6;
+        color: #5f6670;
+        align-self: center;
+    }
+
+    .dashboard-empty {
+        color: #8f9197;
+        text-align: center;
+        padding: 24px;
+        background: #faf7f3;
+        border-radius: 12px;
+    }
+
+    @media (max-width: 1180px) {
+        .dashboard-metrics {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .dashboard-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .dashboard-metrics {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-panel-title {
+            font-size: 18px;
+        }
+
+        .dashboard-chart {
+            grid-template-columns: 42px minmax(0, 1fr);
+        }
+
+        .dashboard-product-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-activity-item {
+            grid-template-columns: auto 1fr;
+        }
+
+        .dashboard-role-pill {
+            justify-self: start;
+        }
+    }
+</style>
+
+<div class="dashboard-shell">
+    <div id="dashboard-metrics" class="dashboard-metrics">
+        <div class="dashboard-card"><div class="dashboard-card-icon" style="background:#f6eee3;color:#8a5a34;"><i class="fas fa-box"></i></div><div><h4>Memuat</h4><strong>...</strong><span>Mohon tunggu</span></div></div>
+    </div>
+
+    <div class="dashboard-layout">
+        <div class="dashboard-column">
+            <section class="dashboard-panel dashboard-chart-card">
+                <div class="dashboard-panel-head dashboard-chart-header">
+                    <div>
+                        <div class="dashboard-panel-title"><span class="dashboard-panel-number">1</span>Grafik Penjualan Bulanan</div>
+                        <p>Pergerakan omzet per bulan dari transaksi tersimpan.</p>
+                    </div>
+                    <button class="dashboard-panel-link" type="button">Lihat Semua</button>
+                </div>
+
+                <div class="dashboard-chart">
+                    <div class="dashboard-axis" id="dashboard-axis-y"></div>
+                    <div class="dashboard-plot">
+                        <div class="dashboard-grid-lines"></div>
+                        <div id="dashboard-tooltip" class="dashboard-tooltip"></div>
+                        <svg id="dashboard-chart-svg" class="dashboard-chart-svg" viewBox="0 0 720 224" preserveAspectRatio="none"></svg>
+                        <div id="dashboard-chart-months" class="dashboard-chart-months"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-panel">
+                <div class="dashboard-panel-head">
+                    <div>
+                        <div class="dashboard-panel-title"><span class="dashboard-panel-number">3</span>Notifikasi Stok Minimum</div>
+                    </div>
+                    <button class="dashboard-panel-link" id="dashboard-show-low-stock" type="button">Lihat Semua</button>
+                </div>
+
+                <div class="dashboard-alert">
+                    <i class="fas fa-triangle-exclamation" style="margin-top:2px;"></i>
+                    <div>
+                        <strong>Stok berada di bawah batas minimum.</strong>
+                        <div>Segera lakukan pembelian untuk menghindari kehabisan stok.</div>
+                    </div>
+                </div>
+
+                <div id="dashboard-low-stock-content"></div>
+            </section>
         </div>
-        <div style="flex: 1; min-width: 200px; background: #eef8f2; padding: 20px; border-radius: 8px; border-left: 4px solid #2ecc71;">
-            <h4 style="color: #555; margin-bottom: 10px;">Penjualan Hari Ini</h4>
-            <h1 style="color: #2c3e50;">Rp 4.500.000</h1>
+
+        <div class="dashboard-column">
+            <section class="dashboard-panel">
+                <div class="dashboard-panel-head">
+                    <div>
+                        <div class="dashboard-panel-title"><span class="dashboard-panel-number">2</span>Top 5 Produk Terlaris</div>
+                    </div>
+                    <button class="dashboard-panel-link" type="button">Lihat Semua</button>
+                </div>
+                <div id="dashboard-top-products" class="dashboard-product-list"></div>
+            </section>
+
+            <section class="dashboard-panel">
+                <div class="dashboard-panel-head">
+                    <div>
+                        <div class="dashboard-panel-title"><span class="dashboard-panel-number">4</span>Aktivitas Terbaru</div>
+                    </div>
+                    <button class="dashboard-panel-link" type="button">Lihat Semua</button>
+                </div>
+                <div id="dashboard-activities" class="dashboard-activity-list"></div>
+            </section>
         </div>
     </div>
 </div>
+
+<script src="app-store.js?v=20260701"></script>
+<script>
+    (async () => {
+        const store = window.EnrekangStore;
+        const metricsContainer = document.getElementById('dashboard-metrics');
+        const lowStockContent = document.getElementById('dashboard-low-stock-content');
+        const topProductsContainer = document.getElementById('dashboard-top-products');
+        const activitiesContainer = document.getElementById('dashboard-activities');
+        const axisYContainer = document.getElementById('dashboard-axis-y');
+        const monthsContainer = document.getElementById('dashboard-chart-months');
+        const chartSvg = document.getElementById('dashboard-chart-svg');
+        const tooltip = document.getElementById('dashboard-tooltip');
+        const showLowStockButton = document.getElementById('dashboard-show-low-stock');
+
+        const escapeHtml = (value) => String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+        const formatCompact = (value) => {
+            const amount = Number(value || 0);
+            if (amount >= 1000000) {
+                return `Rp ${(amount / 1000000).toFixed(1).replace('.0', '')} Jt`;
+            }
+            if (amount >= 1000) {
+                return `Rp ${(amount / 1000).toFixed(0)} Rb`;
+            }
+            return `Rp ${amount}`;
+        };
+
+        const buildMonthSeries = (transactions) => {
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            const currentYear = new Date().getFullYear();
+            const totals = new Array(12).fill(0);
+
+            transactions.forEach((transaction) => {
+                const date = new Date(transaction.createdAt);
+                if (Number.isNaN(date.getTime()) || date.getFullYear() !== currentYear) {
+                    return;
+                }
+                totals[date.getMonth()] += Number(transaction.total || 0);
+            });
+
+            return labels.map((label, index) => ({ label, value: totals[index] }));
+        };
+
+        const renderChart = (series) => {
+            const maxValue = Math.max(...series.map(item => item.value), 1);
+            const roundedMax = Math.ceil(maxValue / 1000000) * 1000000;
+            const stepValue = Math.max(roundedMax / 5, 1);
+
+            axisYContainer.innerHTML = [5, 4, 3, 2, 1, 0].map(step => `<span>${formatCompact(step * stepValue)}</span>`).join('');
+            monthsContainer.innerHTML = series.map(item => `<span>${item.label}</span>`).join('');
+
+            const pointGap = 720 / (series.length - 1);
+            const points = series.map((item, index) => {
+                const x = index * pointGap;
+                const y = 208 - ((item.value / (stepValue * 5)) * 180);
+                return { ...item, x, y: Number.isFinite(y) ? y : 208 };
+            });
+
+            const linePath = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
+            chartSvg.innerHTML = `
+                <path d="${linePath}" fill="none" stroke="#7a4f2f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+                ${points.map(point => `
+                    <g class="chart-point" data-label="${point.label}" data-value="${store.formatRupiah(point.value)}">
+                        <circle cx="${point.x}" cy="${point.y}" r="7" fill="#7a4f2f"></circle>
+                        <circle cx="${point.x}" cy="${point.y}" r="13" fill="rgba(122, 79, 47, 0.12)"></circle>
+                    </g>
+                `).join('')}
+            `;
+
+            chartSvg.querySelectorAll('.chart-point').forEach(point => {
+                point.addEventListener('mouseenter', () => {
+                    tooltip.innerHTML = `<strong>${point.dataset.label} ${new Date().getFullYear()}</strong><br>${point.dataset.value}`;
+                    tooltip.classList.add('active');
+                });
+                point.addEventListener('mouseleave', () => {
+                    tooltip.classList.remove('active');
+                });
+            });
+        };
+
+        const renderLowStockTable = (items) => {
+            if (!items.length) {
+                lowStockContent.innerHTML = '<div class="dashboard-empty">Tidak ada barang dengan stok menipis saat ini.</div>';
+                return;
+            }
+
+            lowStockContent.innerHTML = `
+                <div style="overflow-x:auto;">
+                    <table class="dashboard-low-stock-table">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th>Kategori</th>
+                                <th>Stok Tersisa</th>
+                                <th>Batas Minimum</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.slice(0, 5).map(item => `
+                                <tr>
+                                    <td>${escapeHtml(item.namaItem || '-')}</td>
+                                    <td>${escapeHtml(item.__kategori || item.__lokasi || '-')}</td>
+                                    <td>${escapeHtml(String(item.currentStock || 0))}</td>
+                                    <td>5</td>
+                                    <td><span class="dashboard-status-pill ${Number(item.currentStock || 0) <= 2 ? 'danger' : 'warning'}">${Number(item.currentStock || 0) <= 2 ? 'Hampir Habis' : 'Stok Rendah'}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        };
+
+        try {
+            const [summary, transactions, report, effectiveItems] = await Promise.all([
+                store.getDashboardSummary(),
+                Promise.resolve(store.getTransactions()),
+                store.getReport('', ''),
+                store.getEffectiveItems()
+            ]);
+            const customerCount = new Set(transactions.map(transaction => (transaction.customerName || 'Pelanggan Umum').trim()).filter(Boolean)).size;
+            const monthSeries = buildMonthSeries(transactions);
+
+            metricsContainer.innerHTML = [
+                {
+                    title: 'Total Produk',
+                    value: summary.totalProduk,
+                    note: 'Produk aktif',
+                    icon: 'fa-box',
+                    iconStyle: 'background:#f6eee3;color:#8a5a34;'
+                },
+                {
+                    title: 'Penjualan Hari Ini',
+                    value: store.formatRupiah(summary.penjualanHariIni),
+                    note: `${summary.transaksiHariIni} transaksi`,
+                    icon: 'fa-cart-shopping',
+                    iconStyle: 'background:#fdeceb;color:#e05a47;'
+                },
+                {
+                    title: 'Total Pelanggan',
+                    value: customerCount,
+                    note: 'Pelanggan tercatat',
+                    icon: 'fa-users',
+                    iconStyle: 'background:#e8f7ee;color:#2a8b57;'
+                },
+                {
+                    title: 'Stok Menipis',
+                    value: summary.stokMenipis,
+                    note: 'Produk perlu restock',
+                    action: 'low-stock',
+                    icon: 'fa-box-open',
+                    iconStyle: 'background:#fff2d8;color:#ba7b12;'
+                }
+            ].map(card => `
+                <div class="dashboard-card ${card.action ? 'is-clickable' : ''}" ${card.action ? `data-action="${card.action}"` : ''}>
+                    <div class="dashboard-card-icon" style="${card.iconStyle}"><i class="fas ${card.icon}"></i></div>
+                    <div>
+                        <h4>${card.title}</h4>
+                        <strong>${card.value}</strong>
+                        <span>${card.note}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            renderChart(monthSeries);
+            renderLowStockTable(summary.lowStockItems || []);
+
+            if (!report.topItems.length) {
+                topProductsContainer.innerHTML = '<div class="dashboard-empty">Belum ada produk terlaris karena transaksi masih kosong.</div>';
+            } else {
+                const highestQty = Math.max(...report.topItems.slice(0, 5).map(item => Number(item.qty || 0)), 1);
+                topProductsContainer.innerHTML = report.topItems.slice(0, 5).map((item, index) => `
+                    <div class="dashboard-product-row">
+                        <span class="dashboard-rank ${index === 0 ? 'is-top' : ''}">${index + 1}</span>
+                        <div class="dashboard-product-meta">
+                            <div class="dashboard-product-name">${escapeHtml(item.namaItem || '-')}</div>
+                            <div class="dashboard-progress"><span style="width:${Math.max(16, Math.round((Number(item.qty || 0) / highestQty) * 100))}%;"></span></div>
+                        </div>
+                        <div class="dashboard-product-value">${escapeHtml(String(item.qty || 0))} Terjual</div>
+                    </div>
+                `).join('');
+            }
+
+            const activityItems = [
+                ...summary.lowStockItems.slice(0, 2).map(item => ({
+                    type: 'stock-alert',
+                    createdAt: new Date().toISOString(),
+                    title: 'Notifikasi stok minimum',
+                    detail: `${item.namaItem} tersisa ${item.currentStock} pcs`,
+                    role: 'Admin'
+                })),
+                ...summary.transaksiTerbaru.map(transaction => ({
+                    type: 'transaction',
+                    createdAt: transaction.createdAt,
+                    title: `Transaksi #${transaction.invoiceNumber} berhasil`,
+                    detail: `Total ${store.formatRupiah(transaction.total)}`,
+                    role: transaction.cashierName || 'Kasir'
+                })),
+                ...effectiveItems.filter(item => Number(item.stokTambahan || 0) > 0).slice(0, 2).map(item => ({
+                    type: 'stock-in',
+                    createdAt: new Date().toISOString(),
+                    title: 'Stok masuk dicatat',
+                    detail: `${item.namaItem} + ${item.stokTambahan} pcs`,
+                    role: 'Admin'
+                }))
+            ].sort((left, right) => new Date(right.createdAt) - new Date(left.createdAt)).slice(0, 5);
+
+            if (!activityItems.length) {
+                activitiesContainer.innerHTML = '<div class="dashboard-empty">Belum ada aktivitas terbaru.</div>';
+            } else {
+                const activityMeta = {
+                    transaction: { icon: 'fa-cart-shopping', bg: '#edf4ff', color: '#3368bf' },
+                    'stock-in': { icon: 'fa-box', bg: '#e8f7ee', color: '#2a8b57' },
+                    'stock-alert': { icon: 'fa-arrow-down', bg: '#fdeceb', color: '#c95145' }
+                };
+
+                activitiesContainer.innerHTML = activityItems.map(activity => {
+                    const meta = activityMeta[activity.type] || activityMeta.transaction;
+                    const time = new Date(activity.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
+                    return `
+                        <div class="dashboard-activity-item">
+                            <div class="dashboard-activity-time">${time}</div>
+                            <div class="dashboard-activity-icon" style="background:${meta.bg};color:${meta.color};"><i class="fas ${meta.icon}"></i></div>
+                            <div class="dashboard-activity-copy">
+                                <strong>${escapeHtml(activity.title)}</strong>
+                                <small>${escapeHtml(activity.detail)}</small>
+                            </div>
+                            <span class="dashboard-role-pill">${escapeHtml(activity.role)}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            metricsContainer.addEventListener('click', (event) => {
+                const card = event.target.closest('[data-action="low-stock"]');
+                if (!card) {
+                    return;
+                }
+                showLowStockButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
+            showLowStockButton.addEventListener('click', () => {
+                lowStockContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        } catch (error) {
+            metricsContainer.innerHTML = `<div class="dashboard-card"><h4>Error</h4><strong>Gagal</strong><span>${error.message}</span></div>`;
+            topProductsContainer.innerHTML = '';
+            activitiesContainer.innerHTML = '';
+            lowStockContent.innerHTML = '';
+        }
+    })();
+</script>

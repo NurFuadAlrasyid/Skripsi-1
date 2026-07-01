@@ -1,8 +1,474 @@
-<div style="background-color: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-    <h2 style="color: #333; margin-bottom: 15px;"><i class="fas fa-shopping-cart" style="color: #7a5032;"></i> Kasir Penjualan</h2>
-    <p style="color: #666; margin-bottom: 20px;">Gunakan halaman ini untuk mencatat barang yang dibeli oleh pelanggan.</p>
-    
-    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
-        <p style="text-align: center; color: #888;">[ Area Form Kasir Akan Ditambahkan di Sini ]</p>
+<style>
+    .sales-shell {
+        display: grid;
+        gap: 20px;
+    }
+
+    .sales-card {
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 18px 35px rgba(122, 80, 50, 0.08);
+        border: 1px solid rgba(122, 80, 50, 0.08);
+        padding: 24px;
+    }
+
+    .sales-card h2,
+    .sales-card h3 {
+        color: #2f3136;
+        margin-bottom: 10px;
+    }
+
+    .sales-card p {
+        color: #6e747d;
+    }
+
+    .sales-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
+        gap: 20px;
+    }
+
+    .sales-form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+        margin: 18px 0;
+    }
+
+    .sales-field label {
+        display: block;
+        color: #725742;
+        font-weight: 600;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .sales-field input,
+    .sales-field textarea {
+        width: 100%;
+        border: 1px solid #d9cfc5;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font: inherit;
+        background: #fffdf9;
+    }
+
+    .sales-search-results {
+        display: grid;
+        gap: 10px;
+        max-height: 420px;
+        overflow: auto;
+        margin-top: 18px;
+    }
+
+    .sales-result {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid #eadfd2;
+        background: linear-gradient(135deg, #fffdf9, #f8f1e7);
+    }
+
+    .sales-result strong {
+        color: #2f3136;
+    }
+
+    .sales-result small {
+        color: #7d6f61;
+    }
+
+    .sales-button,
+    .sales-result button {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-weight: 600;
+        font: inherit;
+    }
+
+    .sales-button-primary,
+    .sales-result button {
+        background: linear-gradient(135deg, #8a5a34, #a86c1d);
+        color: white;
+        box-shadow: 0 10px 20px rgba(138, 90, 52, 0.2);
+    }
+
+    .sales-button-secondary {
+        background: #f6eee3;
+        color: #7a5032;
+        border: 1px solid #e7d5be;
+    }
+
+    .sales-cart-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+    }
+
+    .sales-cart-table th,
+    .sales-cart-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #eee3d8;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .sales-cart-table input {
+        width: 72px;
+        padding: 8px;
+        border-radius: 10px;
+        border: 1px solid #d7ccc0;
+    }
+
+    .sales-summary {
+        display: grid;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .sales-summary-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: #5f6670;
+    }
+
+    .sales-summary-row.total {
+        font-size: 22px;
+        font-weight: 700;
+        color: #2f3136;
+        padding-top: 12px;
+        border-top: 1px dashed #d4c0aa;
+    }
+
+    .sales-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #f6eee3;
+        color: #8a5a34;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .sales-alert {
+        display: none;
+        padding: 14px 16px;
+        border-radius: 12px;
+        margin-top: 16px;
+        font-weight: 600;
+    }
+
+    .sales-alert.success {
+        display: block;
+        background: #e8f7ee;
+        color: #1d7c46;
+        border: 1px solid #c4ebd3;
+    }
+
+    .sales-alert.error {
+        display: block;
+        background: #fdeceb;
+        color: #b64136;
+        border: 1px solid #f7d0cd;
+    }
+
+    .sales-empty {
+        padding: 18px;
+        border-radius: 12px;
+        text-align: center;
+        color: #888;
+        background: #fbf8f4;
+        border: 1px dashed #dccab6;
+    }
+
+    @media (max-width: 920px) {
+        .sales-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="sales-shell">
+    <div class="sales-card">
+        <h2><i class="fas fa-shopping-cart" style="color: #7a5032;"></i> Kasir Penjualan</h2>
+        <p>Gunakan pencarian nama, kode item, atau barcode untuk menambahkan barang ke keranjang. Transaksi tersimpan di browser ini dan otomatis mengurangi stok tampilan.</p>
+    </div>
+
+    <div class="sales-grid">
+        <div class="sales-card">
+            <h3>Cari Barang</h3>
+            <div class="sales-form-row">
+                <div class="sales-field">
+                    <label for="sales-search">Cari Barang</label>
+                    <input id="sales-search" type="text" placeholder="Ketik nama barang, kode item, atau barcode">
+                </div>
+                <div class="sales-field">
+                    <label for="sales-customer">Nama Pelanggan</label>
+                    <input id="sales-customer" type="text" placeholder="Opsional">
+                </div>
+                <div class="sales-field">
+                    <label for="sales-cashier">Kasir</label>
+                    <input id="sales-cashier" type="text" value="Alif Batara Radja">
+                </div>
+            </div>
+            <div id="sales-results" class="sales-search-results"></div>
+        </div>
+
+        <div class="sales-card">
+            <h3>Keranjang</h3>
+            <div id="sales-cart"></div>
+            <div id="sales-alert" class="sales-alert"></div>
+            <div class="sales-form-row" style="margin-top: 20px;">
+                <div class="sales-field">
+                    <label for="sales-payment">Nominal Bayar</label>
+                    <input id="sales-payment" type="number" min="0" step="1000" placeholder="0">
+                </div>
+                <div class="sales-field">
+                    <label for="sales-notes">Catatan</label>
+                    <textarea id="sales-notes" rows="2" placeholder="Opsional"></textarea>
+                </div>
+            </div>
+            <div class="sales-summary">
+                <div class="sales-summary-row"><span>Total Item</span><strong id="summary-items">0</strong></div>
+                <div class="sales-summary-row"><span>Total Belanja</span><strong id="summary-total">Rp 0</strong></div>
+                <div class="sales-summary-row"><span>Kembalian</span><strong id="summary-change">Rp 0</strong></div>
+                <div class="sales-summary-row total"><span>Siap Checkout</span><strong id="summary-ready">Rp 0</strong></div>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap;">
+                <button id="sales-clear" class="sales-button sales-button-secondary" type="button">Kosongkan Keranjang</button>
+                <button id="sales-checkout" class="sales-button sales-button-primary" type="button">Simpan Transaksi</button>
+            </div>
+        </div>
     </div>
 </div>
+
+<script src="app-store.js?v=20260701"></script>
+<script>
+    (async () => {
+        const store = window.EnrekangStore;
+        const searchInput = document.getElementById('sales-search');
+        const customerInput = document.getElementById('sales-customer');
+        const cashierInput = document.getElementById('sales-cashier');
+        const notesInput = document.getElementById('sales-notes');
+        const paymentInput = document.getElementById('sales-payment');
+        const resultsContainer = document.getElementById('sales-results');
+        const cartContainer = document.getElementById('sales-cart');
+        const alertBox = document.getElementById('sales-alert');
+        const summaryItems = document.getElementById('summary-items');
+        const summaryTotal = document.getElementById('summary-total');
+        const summaryChange = document.getElementById('summary-change');
+        const summaryReady = document.getElementById('summary-ready');
+
+        const state = {
+            items: [],
+            cart: []
+        };
+
+        function setAlert(type, message) {
+            alertBox.className = `sales-alert ${type}`;
+            alertBox.textContent = message;
+        }
+
+        function clearAlert() {
+            alertBox.className = 'sales-alert';
+            alertBox.textContent = '';
+        }
+
+        function getCartQty(itemKey) {
+            const existing = state.cart.find(item => item.itemKey === itemKey);
+            return existing ? Number(existing.qty || 0) : 0;
+        }
+
+        function getCartTotal() {
+            return state.cart.reduce((sum, item) => sum + (item.qty * item.hargaJual), 0);
+        }
+
+        function renderSummary() {
+            const totalItems = state.cart.reduce((sum, item) => sum + item.qty, 0);
+            const total = getCartTotal();
+            const payment = Number(paymentInput.value || 0);
+            const change = Math.max(0, payment - total);
+
+            summaryItems.textContent = `${totalItems} item`;
+            summaryTotal.textContent = store.formatRupiah(total);
+            summaryChange.textContent = store.formatRupiah(change);
+            summaryReady.textContent = store.formatRupiah(total);
+        }
+
+        function renderCart() {
+            if (!state.cart.length) {
+                cartContainer.innerHTML = '<div class="sales-empty">Keranjang masih kosong.</div>';
+                renderSummary();
+                return;
+            }
+
+            cartContainer.innerHTML = `
+                <table class="sales-cart-table">
+                    <thead>
+                        <tr>
+                            <th>Barang</th>
+                            <th>Qty</th>
+                            <th>Harga</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${state.cart.map(item => `
+                            <tr>
+                                <td>
+                                    <strong>${item.namaItem}</strong><br>
+                                    <small>${item.kodeItem || '-'} • ${item.barcode || 'Tanpa barcode'}</small>
+                                </td>
+                                <td>
+                                    <input type="number" min="1" max="${item.maxStock}" value="${item.qty}" data-qty-key="${item.itemKey}">
+                                </td>
+                                <td>${store.formatRupiah(item.hargaJual)}</td>
+                                <td>${store.formatRupiah(item.qty * item.hargaJual)}</td>
+                                <td><button class="sales-button sales-button-secondary" type="button" data-remove-key="${item.itemKey}">Hapus</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            cartContainer.querySelectorAll('[data-qty-key]').forEach(input => {
+                input.addEventListener('change', (event) => {
+                    const item = state.cart.find(entry => entry.itemKey === event.target.dataset.qtyKey);
+                    if (!item) {
+                        return;
+                    }
+                    const nextQty = Math.max(1, Math.min(item.maxStock, Number(event.target.value || 1)));
+                    item.qty = nextQty;
+                    renderCart();
+                });
+            });
+
+            cartContainer.querySelectorAll('[data-remove-key]').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    state.cart = state.cart.filter(item => item.itemKey !== event.target.dataset.removeKey);
+                    renderCart();
+                    renderResults();
+                });
+            });
+
+            renderSummary();
+        }
+
+        function addToCart(item) {
+            clearAlert();
+            const existing = state.cart.find(entry => entry.itemKey === item.__itemKey);
+            if (existing) {
+                if (existing.qty >= item.currentStock) {
+                    setAlert('error', `Stok ${item.namaItem} sudah mencapai batas tersedia.`);
+                    return;
+                }
+                existing.qty += 1;
+                renderCart();
+                renderResults();
+                return;
+            }
+
+            state.cart.push({
+                itemKey: item.__itemKey,
+                kodeItem: item.kodeItem || '',
+                barcode: item.barcode || '',
+                namaItem: item.namaItem,
+                hargaJual: Number(item.hargaJual || 0),
+                qty: 1,
+                maxStock: item.currentStock
+            });
+            renderCart();
+            renderResults();
+        }
+
+        function renderResults() {
+            const keyword = searchInput.value.trim().toLowerCase();
+            const candidates = state.items.filter(item => {
+                if (!keyword) {
+                    return item.currentStock > 0;
+                }
+                const haystack = [item.namaItem, item.kodeItem, item.barcode, item.__path].join(' ').toLowerCase();
+                return haystack.includes(keyword) && item.currentStock > 0;
+            }).slice(0, 30);
+
+            if (!candidates.length) {
+                resultsContainer.innerHTML = '<div class="sales-empty">Barang tidak ditemukan atau stok habis.</div>';
+                return;
+            }
+
+            resultsContainer.innerHTML = candidates.map(item => {
+                const qtyInCart = getCartQty(item.__itemKey);
+                const disabled = qtyInCart >= item.currentStock;
+                return `
+                    <div class="sales-result">
+                        <div>
+                            <strong>${item.namaItem}</strong><br>
+                            <small>${item.kodeItem || '-'} • ${item.barcode || 'Tanpa barcode'}</small>
+                            <div class="sales-pill"><i class="fas fa-location-dot"></i>${item.__path}</div>
+                            <div class="sales-pill"><i class="fas fa-box"></i>Stok tersedia ${item.currentStock}</div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; justify-content:space-between; align-items:flex-end; gap:10px;">
+                            <strong style="color:#7a5032;">${store.formatRupiah(item.hargaJual)}</strong>
+                            <button type="button" data-add-key="${item.__itemKey}" ${disabled ? 'disabled' : ''}>${disabled ? 'Penuh' : 'Tambah'}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            resultsContainer.querySelectorAll('[data-add-key]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const item = state.items.find(entry => entry.__itemKey === button.dataset.addKey);
+                    if (item) {
+                        addToCart(item);
+                    }
+                });
+            });
+        }
+
+        async function refreshItems() {
+            state.items = await store.getEffectiveItems();
+            renderResults();
+            renderCart();
+        }
+
+        document.getElementById('sales-clear').addEventListener('click', () => {
+            state.cart = [];
+            clearAlert();
+            renderCart();
+            renderResults();
+        });
+
+        paymentInput.addEventListener('input', renderSummary);
+        searchInput.addEventListener('input', renderResults);
+
+        document.getElementById('sales-checkout').addEventListener('click', async () => {
+            try {
+                clearAlert();
+                const transaction = await store.createTransaction({
+                    cart: state.cart,
+                    customerName: customerInput.value.trim(),
+                    cashierName: cashierInput.value.trim(),
+                    notes: notesInput.value.trim(),
+                    paymentAmount: Number(paymentInput.value || 0)
+                });
+
+                state.cart = [];
+                paymentInput.value = '';
+                notesInput.value = '';
+                setAlert('success', `Transaksi ${transaction.invoiceNumber} berhasil disimpan. Total ${store.formatRupiah(transaction.total)}.`);
+                await refreshItems();
+            } catch (error) {
+                setAlert('error', error.message);
+            }
+        });
+
+        await refreshItems();
+    })();
+</script>

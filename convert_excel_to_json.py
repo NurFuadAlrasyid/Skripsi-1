@@ -2,7 +2,6 @@ import os
 import json
 from pathlib import Path
 import openpyxl
-from openpyxl.utils import get_column_letter
 
 # Path ke folder data
 DATA_FOLDER = Path(__file__).parent / "data"
@@ -14,21 +13,98 @@ COLUMN_NAMES = [
     'kodeBarang', 'hargaJual', 'stok'
 ]
 
-def find_column_index(ws, column_names):
-    """Mencari index kolom berdasarkan nama header"""
-    column_map = {}
-    
-    # Cek row pertama (header)
-    for col_idx, cell in enumerate(ws[1], 1):
-        cell_value = str(cell.value).strip().lower() if cell.value else ""
-        
-        # Cek kecocokan dengan nama kolom yang dicari
-        for col_name in column_names:
-            if col_name.lower() in cell_value or cell_value in col_name.lower():
-                column_map[col_name] = col_idx
-                break
-    
-    return column_map
+HEADER_PATTERNS = {
+    'kodeItem': [('kode', 'item')],
+    'barcode': [('barcode',)],
+    'namaItem': [('nama', 'item')],
+    'hargaPokok': [('harga', 'pokok')],
+    'kodeBarang': [('kode', 'barang'), ('kode', 'harga')],
+    'hargaJual': [('harga', 'jual')],
+    'stok': [('stok',)],
+}
+
+NUMERIC_COLUMNS = {'hargaPokok', 'hargaJual', 'stok'}
+
+
+def normalize_header(value):
+    """Normalisasi nama header supaya mudah dicocokkan."""
+    if value is None:
+        return ""
+    return " ".join(str(value).strip().lower().replace('_', ' ').split())
+
+
+def resolve_header(normalized):
+    """Pilih nama kolom standar dari variasi header Excel."""
+    for canonical, patterns in HEADER_PATTERNS.items():
+        for pattern in patterns:
+            if all(token in normalized for token in pattern):
+                return canonical
+    return None
+
+
+def to_number(value):
+    """Konversi angka dari Excel ke integer yang aman untuk JSON."""
+    if value in (None, ""):
+        return 0
+
+    if isinstance(value, bool):
+        return int(value)
+
+    if isinstance(value, (int, float)):
+        return int(value)
+
+    text = str(value).strip().replace('.', '').replace(',', '')
+    if not text:
+        return 0
+
+    try:
+        return int(float(text))
+    except ValueError:
+        return 0
+
+
+def to_text(value):
+    """Pertahankan teks seperti kode item dan barcode tanpa suffix .0."""
+    if value in (None, ""):
+        return ""
+
+    if isinstance(value, bool):
+        return str(int(value))
+
+    if isinstance(value, int):
+        return str(value)
+
+    if isinstance(value, float):
+        return str(int(value)) if value.is_integer() else str(value)
+
+    return str(value).strip()
+
+def find_header_row_and_columns(ws, column_names):
+    """Cari baris header dan index kolom dari beberapa baris pertama."""
+    max_scan_row = min(ws.max_row, 15)
+    best_row = None
+    best_map = {}
+
+    for row_idx in range(1, max_scan_row + 1):
+        column_map = {}
+        for col_idx, cell in enumerate(ws[row_idx], 1):
+            normalized = normalize_header(cell.value)
+            if not normalized:
+                continue
+
+            canonical = resolve_header(normalized)
+            if canonical in column_names and canonical not in column_map:
+                column_map[canonical] = col_idx
+
+        if len(column_map) > len(best_map):
+            best_row = row_idx
+            best_map = column_map
+
+    required_headers = {'kodeItem', 'namaItem', 'hargaPokok', 'hargaJual', 'stok'}
+    if best_row and len(required_headers.intersection(best_map.keys())) >= 4:
+        return best_row, best_map
+
+    return None, {}
 
 def read_excel_file(file_path):
     """Membaca file Excel dan mengembalikan list of items"""
@@ -37,42 +113,42 @@ def read_excel_file(file_path):
     try:
         wb = openpyxl.load_workbook(file_path, data_only=True)
         ws = wb.active
-        
-        # Cari index kolom
-        column_map = find_column_index(ws, COLUMN_NAMES)
-        
-        if not column_map:
+
+        # Cari baris header dan index kolom
+        header_row, column_map = find_header_row_and_columns(ws, COLUMN_NAMES)
+
+        if not column_map or header_row is None:
             print(f"Tidak ada header yang cocok di {file_path.name}")
             return items
-        
-        # Baca data mulai dari row 2 (skip header)
-        for row_idx, row in enumerate(ws.iter_rows(min_row=2), start=2):
+
+        # Baca data mulai setelah baris header
+        for row_idx, row in enumerate(ws.iter_rows(min_row=header_row + 1), start=header_row + 1):
             # Cek apakah row kosong
             if all(cell.value is None for cell in row):
                 continue
-            
+
             item = {}
             try:
-                for col_name, col_idx in column_map.items():
-                    cell_value = row[col_idx - 1].value
-                    
-                    # Konversi tipe data
-                    if col_name in ['hargaPokok', 'hargaJual', 'stok']:
-                        item[col_name] = int(cell_value) if cell_value else 0
+                for col_name in COLUMN_NAMES:
+                    col_idx = column_map.get(col_name)
+                    cell_value = row[col_idx - 1].value if col_idx else None
+
+                    if col_name in NUMERIC_COLUMNS:
+                        item[col_name] = to_number(cell_value)
                     else:
-                        item[col_name] = str(cell_value).strip() if cell_value else ""
-                
+                        item[col_name] = to_text(cell_value)
+
                 # Hanya tambah jika ada data minimal
-                if item.get('namaItem'):
+                if item.get('namaItem') and any(item.values()):
                     items.append(item)
             except Exception as e:
                 print(f"  ⚠️  Error di row {row_idx}: {e}")
                 continue
-        
+
         wb.close()
     except Exception as e:
         print(f"Error membaca {file_path}: {e}")
-    
+
     return items
 
 def build_json_structure(data_folder):
@@ -95,10 +171,10 @@ def process_folder(folder_path):
     has_subfolder = False
     items = []
     subfolders = {}
-    
-    for item in os.listdir(folder_path):
+
+    for item in sorted(os.listdir(folder_path)):
         item_path = folder_path / item
-        
+
         if os.path.isdir(item_path):
             # Ada subfolder
             has_subfolder = True
@@ -109,22 +185,19 @@ def process_folder(folder_path):
             has_excel = True
             print(f"  File: {item}")
             file_items = read_excel_file(item_path)
-            items.extend(file_items)
+            if has_subfolder:
+                subfolders[item_path.stem] = file_items
+            else:
+                items.extend(file_items)
             print(f"    {len(file_items)} item terbaca")
-    
+
     # Return struktur yang sesuai
-    if has_subfolder and not has_excel:
-        # Hanya ada subfolder, return dict
+    if has_subfolder:
+        # Folder campuran disimpan sebagai object agar tiap file tetap punya label
         return subfolders
-    elif has_subfolder and has_excel:
-        # Ada keduanya, prioritas subfolder
-        # Tambah items ke subfolder default jika ada
-        if items:
-            subfolders['_items'] = items
-        return subfolders
-    else:
-        # Hanya ada file Excel, return array
-        return items
+
+    # Hanya ada file Excel, return array gabungan
+    return items
 
 def main():
     print("=" * 60)

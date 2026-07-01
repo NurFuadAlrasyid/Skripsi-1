@@ -1,17 +1,169 @@
-<div style="background-color: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-    <h2 style="color: #333; margin-bottom: 15px;"><i class="fas fa-exchange-alt" style="color: #7a5032;"></i> Riwayat Transaksi</h2>
-    <p style="color: #666; margin-bottom: 20px;">Daftar transaksi yang sudah diselesaikan.</p>
-    
-    <ul style="list-style: none; padding: 0;">
-        <li style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
-            <div>
-                <strong>INV-20230501-01</strong><br>
-                <small style="color: #888;">01 Mei 2026 - Kasir: Alif</small>
-            </div>
-            <div style="text-align: right;">
-                <strong style="color: #2ecc71;">Rp 2.500.000</strong><br>
-                <span style="background: #eef8f2; color: #2ecc71; padding: 2px 8px; border-radius: 10px; font-size: 12px;">Lunas</span>
-            </div>
-        </li>
-    </ul>
+<style>
+    .transaction-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 18px 35px rgba(122, 80, 50, 0.08);
+        padding: 24px;
+        border: 1px solid rgba(122, 80, 50, 0.08);
+    }
+
+    .transaction-list {
+        display: grid;
+        gap: 14px;
+        margin-top: 18px;
+    }
+
+    .transaction-item {
+        border: 1px solid #eaded1;
+        border-radius: 14px;
+        overflow: hidden;
+        background: #fffdfb;
+    }
+
+    .transaction-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 18px;
+        background: #f8f1e8;
+    }
+
+    .transaction-head-main {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .transaction-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 14px;
+    }
+
+    .transaction-delete {
+        border: none;
+        border-radius: 10px;
+        background: #c94b4b;
+        color: #fff;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .transaction-delete:hover {
+        background: #ac3d3d;
+    }
+
+    .transaction-body {
+        padding: 16px 18px;
+    }
+
+    .transaction-detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 8px 0;
+        border-bottom: 1px dashed #ebdfd3;
+    }
+
+    .transaction-detail-row:last-child {
+        border-bottom: none;
+    }
+</style>
+
+<div class="transaction-card">
+    <h2 style="color: #333; margin-bottom: 8px;"><i class="fas fa-exchange-alt" style="color: #7a5032;"></i> Riwayat Transaksi</h2>
+    <p style="color: #666; margin-bottom: 20px;">Semua transaksi diambil dari penyimpanan lokal browser ini.</p>
+    <div id="transaction-list" class="transaction-list"></div>
 </div>
+
+<script src="app-store.js?v=20260701"></script>
+<script>
+    (() => {
+        const store = window.EnrekangStore;
+        const container = document.getElementById('transaction-list');
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function renderTransactions() {
+            const transactions = store.getTransactions();
+
+            if (!transactions.length) {
+                container.innerHTML = '<div style="padding: 20px; border: 1px dashed #ddd; border-radius: 12px; color: #888; text-align: center;">Belum ada transaksi yang tersimpan.</div>';
+                return;
+            }
+
+            container.innerHTML = transactions.map(transaction => `
+                <details class="transaction-item">
+                    <summary class="transaction-head" style="cursor: pointer; list-style: none;">
+                        <div class="transaction-head-main">
+                            <div>
+                                <strong>${escapeHtml(transaction.invoiceNumber)}</strong><br>
+                                <small style="color:#7b6d62;">${escapeHtml(store.formatDateTime(transaction.createdAt))} • Kasir: ${escapeHtml(transaction.cashierName)}</small><br>
+                                <small style="color:#7b6d62;">Pelanggan: ${escapeHtml(transaction.customerName)}</small>
+                            </div>
+                            <div style="text-align:right;">
+                                <strong style="color:#7a5032;">${escapeHtml(store.formatRupiah(transaction.total))}</strong><br>
+                                <small style="color:#1d7c46;">${escapeHtml(transaction.status)}</small>
+                            </div>
+                        </div>
+                    </summary>
+                    <div class="transaction-body">
+                        ${transaction.items.map(item => `
+                            <div class="transaction-detail-row">
+                                <div>
+                                    <strong>${escapeHtml(item.namaItem)}</strong><br>
+                                    <small>${escapeHtml(item.kodeItem || '-')} • ${escapeHtml(item.barcode || 'Tanpa barcode')}</small>
+                                </div>
+                                <div style="text-align:right;">
+                                    <strong>${escapeHtml(String(item.qty))} x ${escapeHtml(store.formatRupiah(item.hargaJual))}</strong><br>
+                                    <small>${escapeHtml(store.formatRupiah(item.subtotal))}</small>
+                                </div>
+                            </div>
+                        `).join('')}
+                        <div style="display:flex; justify-content:space-between; margin-top:16px; color:#666;">
+                            <span>Bayar: ${escapeHtml(store.formatRupiah(transaction.paymentAmount))}</span>
+                            <span>Kembalian: ${escapeHtml(store.formatRupiah(transaction.changeAmount))}</span>
+                        </div>
+                        <div class="transaction-actions">
+                            <button type="button" class="transaction-delete" data-transaction-id="${escapeHtml(transaction.id)}">Hapus Transaksi</button>
+                        </div>
+                    </div>
+                </details>
+            `).join('');
+        }
+
+        container.addEventListener('click', (event) => {
+            const button = event.target.closest('.transaction-delete');
+            if (!button) {
+                return;
+            }
+
+            const transactionId = button.dataset.transactionId;
+            const confirmed = window.confirm('Hapus transaksi ini? Stok barang akan dikembalikan sesuai item yang dihapus.');
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                store.deleteTransaction(transactionId);
+                renderTransactions();
+            } catch (error) {
+                window.alert(error.message);
+            }
+        });
+
+        window.addEventListener('enrekang-transactions-updated', renderTransactions);
+        renderTransactions();
+    })();
+</script>
