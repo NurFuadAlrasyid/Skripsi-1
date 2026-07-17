@@ -209,10 +209,6 @@
                     <input id="sales-search" type="text" placeholder="Ketik nama barang, kode item, atau barcode">
                 </div>
                 <div class="sales-field">
-                    <label for="sales-customer">Nama Pelanggan</label>
-                    <input id="sales-customer" type="text" placeholder="Opsional">
-                </div>
-                <div class="sales-field">
                     <label for="sales-cashier">Kasir</label>
                     <input id="sales-cashier" type="text" value="Alif Batara Radja">
                 </div>
@@ -225,6 +221,10 @@
             <div id="sales-cart"></div>
             <div id="sales-alert" class="sales-alert"></div>
             <div class="sales-form-row" style="margin-top: 20px;">
+                <div class="sales-field">
+                    <label for="sales-customer">Nama Pelanggan</label>
+                    <input id="sales-customer" type="text" placeholder="Opsional">
+                </div>
                 <div class="sales-field">
                     <label for="sales-payment">Nominal Bayar</label>
                     <input id="sales-payment" type="number" min="0" step="1000" placeholder="0">
@@ -351,7 +351,15 @@
             });
 
             cartContainer.querySelectorAll('[data-remove-key]').forEach(button => {
-                button.addEventListener('click', (event) => {
+                button.addEventListener('click', async (event) => {
+                    const confirmed = await window.showAppConfirm({
+                        title: 'Konfirmasi Hapus Barang',
+                        message: 'Barang ini akan dihapus dari keranjang. Lanjutkan?'
+                    });
+                    if (!confirmed) {
+                        return;
+                    }
+
                     state.cart = state.cart.filter(item => item.itemKey !== event.target.dataset.removeKey);
                     renderCart();
                     renderResults();

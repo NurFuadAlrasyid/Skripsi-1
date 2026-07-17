@@ -39,6 +39,28 @@
         border-bottom: 1px solid #eee1d3;
         text-align: left;
     }
+
+    .report-table th:last-child,
+    .report-table td:last-child {
+        text-align: right;
+        width: 1%;
+        white-space: nowrap;
+    }
+
+    .report-delete-button {
+        border: none;
+        border-radius: 10px;
+        width: 34px;
+        height: 34px;
+        cursor: pointer;
+        background: #fff1f0;
+        color: #c65348;
+        border: 1px solid #f0c8c4;
+    }
+
+    .report-delete-button:hover {
+        background: #ffe5e2;
+    }
 </style>
 
 <div class="report-card">
@@ -64,11 +86,22 @@
         const endInput = document.getElementById('report-end');
         const metricsContainer = document.getElementById('report-metrics');
         const topItemsContainer = document.getElementById('report-top-items');
+        const reportDateFormatter = new Intl.DateTimeFormat('id-ID', {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
 
         const today = store.getLocalDateString();
         const monthStart = `${today.slice(0, 8)}01`;
         startInput.value = monthStart;
         endInput.value = today;
+
+        function formatReportDate(value) {
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? '-' : reportDateFormatter.format(date);
+        }
 
         async function renderReport() {
             const report = await store.getReport(startInput.value, endInput.value);
@@ -84,29 +117,56 @@
                 </div>
             `).join('');
 
-            if (!report.topItems.length) {
+            if (!report.lineItems.length) {
                 topItemsContainer.innerHTML = '<div style="padding: 20px; text-align:center; color:#888; border:1px dashed #ddd; border-radius:12px;">Belum ada transaksi pada periode ini.</div>';
                 return;
             }
 
             topItemsContainer.innerHTML = `
-                <h3 style="margin: 22px 0 12px; color:#2f3136;">Barang Terlaris</h3>
+                <h3 style="margin: 22px 0 12px; color:#2f3136;">Daftar Transaksi Barang</h3>
                 <table class="report-table">
                     <thead>
-                        <tr><th>Nama Barang</th><th>Barcode</th><th>Qty</th><th>Omzet</th></tr>
+                        <tr><th>Nama Barang</th><th>Nama Pelanggan</th><th>Tanggal</th><th>Barcode</th><th>Qty</th><th>Omzet</th><th>Catatan</th><th></th></tr>
                     </thead>
                     <tbody>
-                        ${report.topItems.map(item => `
+                        ${report.lineItems.map(item => `
                             <tr>
                                 <td>${item.namaItem}</td>
+                                <td>${item.customerName || '-'}</td>
+                                <td>${formatReportDate(item.createdAt)}</td>
                                 <td>${item.barcode || '-'}</td>
                                 <td>${item.qty}</td>
                                 <td>${store.formatRupiah(item.omzet)}</td>
+                                <td>${item.notes || '-'}</td>
+                                <td>
+                                    <button type="button" class="report-delete-button" data-transaction-id="${item.transactionId}" data-item-key="${item.itemKey}" title="Hapus item transaksi">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
             `;
+
+            topItemsContainer.querySelectorAll('[data-transaction-id][data-item-key]').forEach((button) => {
+                button.addEventListener('click', async () => {
+                    const confirmed = await window.showAppConfirm({
+                        title: 'Konfirmasi Hapus Laporan',
+                        message: 'Item transaksi ini akan dihapus permanen dari laporan dan data transaksi. Lanjutkan?'
+                    });
+                    if (!confirmed) {
+                        return;
+                    }
+
+                    try {
+                        store.deleteTransactionItem(button.dataset.transactionId, button.dataset.itemKey);
+                        await renderReport();
+                    } catch (error) {
+                        window.alert(error.message);
+                    }
+                });
+            });
         }
 
         document.getElementById('report-run').addEventListener('click', renderReport);

@@ -167,6 +167,13 @@
         border-radius: 14px 14px 0 0;
     }
 
+    .dashboard-chart-surface {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 224px;
+    }
+
     .dashboard-chart-svg {
         position: relative;
         width: 100%;
@@ -190,8 +197,8 @@
     .dashboard-tooltip {
         position: absolute;
         top: 16px;
-        left: 50%;
-        transform: translateX(-50%);
+        left: 0;
+        transform: translate(-50%, -100%);
         background: white;
         color: #2f3136;
         border-radius: 12px;
@@ -207,6 +214,111 @@
 
     .dashboard-tooltip.active {
         opacity: 1;
+    }
+
+    .dashboard-detail-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(34, 24, 16, 0.36);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        z-index: 320;
+    }
+
+    .dashboard-detail-modal.is-open {
+        display: flex;
+    }
+
+    .dashboard-detail-dialog {
+        width: min(960px, 100%);
+        max-height: min(90vh, 880px);
+        overflow: auto;
+        background: #fffdf9;
+        border-radius: 24px;
+        border: 1px solid rgba(122, 80, 50, 0.12);
+        box-shadow: 0 30px 54px rgba(70, 40, 18, 0.22);
+        padding: 24px;
+        display: grid;
+        gap: 18px;
+    }
+
+    .dashboard-detail-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .dashboard-detail-head h3 {
+        color: #2f3136;
+        font-size: 24px;
+        margin-bottom: 6px;
+    }
+
+    .dashboard-detail-head p {
+        color: #7d6f61;
+        font-size: 13px;
+    }
+
+    .dashboard-detail-close {
+        border: none;
+        background: #f6eee3;
+        color: #7a5032;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    .dashboard-detail-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .dashboard-detail-toolbar select {
+        border: 1px solid #ddd4ca;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font: inherit;
+        background: #fffdf9;
+        color: #4f5560;
+        font-size: 13px;
+    }
+
+    .dashboard-detail-summary {
+        color: #7a5032;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .dashboard-detail-chart {
+        display: grid;
+        grid-template-columns: 56px minmax(0, 1fr);
+        gap: 14px;
+        min-height: 280px;
+    }
+
+    .dashboard-detail-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .dashboard-detail-table th,
+    .dashboard-detail-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #eee1d3;
+        text-align: left;
+    }
+
+    .dashboard-detail-table th:last-child,
+    .dashboard-detail-table td:last-child {
+        text-align: right;
     }
 
     .dashboard-product-list,
@@ -440,7 +552,7 @@
                         <div class="dashboard-panel-title"><span class="dashboard-panel-number">1</span>Grafik Penjualan Bulanan</div>
                         <p>Pergerakan omzet per bulan dari transaksi tersimpan.</p>
                     </div>
-                    <button class="dashboard-panel-link" type="button">Lihat Semua</button>
+                    <button id="dashboard-show-monthly-detail" class="dashboard-panel-link" type="button">Lihat Semua</button>
                 </div>
 
                 <div class="dashboard-chart">
@@ -448,7 +560,7 @@
                     <div class="dashboard-plot">
                         <div class="dashboard-grid-lines"></div>
                         <div id="dashboard-tooltip" class="dashboard-tooltip"></div>
-                        <svg id="dashboard-chart-svg" class="dashboard-chart-svg" viewBox="0 0 720 224" preserveAspectRatio="none"></svg>
+                        <div id="dashboard-chart-surface" class="dashboard-chart-surface"></div>
                         <div id="dashboard-chart-months" class="dashboard-chart-months"></div>
                     </div>
                 </div>
@@ -498,261 +610,49 @@
     </div>
 </div>
 
+<div id="dashboard-detail-modal" class="dashboard-detail-modal" aria-hidden="true">
+    <div class="dashboard-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="dashboard-detail-title">
+        <div class="dashboard-detail-head">
+            <div>
+                <h3 id="dashboard-detail-title">Penjualan Bulanan</h3>
+                <p>Pilih tahun untuk melihat total penjualan pada setiap bulan.</p>
+            </div>
+            <button id="dashboard-detail-close" class="dashboard-detail-close" type="button" aria-label="Tutup detail bulanan">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="dashboard-detail-toolbar">
+            <div>
+                <label for="dashboard-detail-year" style="display:block; color:#725742; font-weight:600; margin-bottom:6px; font-size:13px;">Pilih Tahun</label>
+                <select id="dashboard-detail-year"></select>
+            </div>
+            <div id="dashboard-detail-summary" class="dashboard-detail-summary"></div>
+        </div>
+
+        <div class="dashboard-detail-chart">
+            <div id="dashboard-detail-axis-y" class="dashboard-axis"></div>
+            <div class="dashboard-plot">
+                <div class="dashboard-grid-lines"></div>
+                <div id="dashboard-detail-tooltip" class="dashboard-tooltip"></div>
+                <div id="dashboard-detail-chart-surface" class="dashboard-chart-surface"></div>
+                <div id="dashboard-detail-chart-months" class="dashboard-chart-months"></div>
+            </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+            <table class="dashboard-detail-table">
+                <thead>
+                    <tr>
+                        <th>Bulan</th>
+                        <th>Total Penjualan</th>
+                    </tr>
+                </thead>
+                <tbody id="dashboard-detail-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <script src="app-store.js?v=20260701"></script>
-<script>
-    (async () => {
-        const store = window.EnrekangStore;
-        const metricsContainer = document.getElementById('dashboard-metrics');
-        const lowStockContent = document.getElementById('dashboard-low-stock-content');
-        const topProductsContainer = document.getElementById('dashboard-top-products');
-        const activitiesContainer = document.getElementById('dashboard-activities');
-        const axisYContainer = document.getElementById('dashboard-axis-y');
-        const monthsContainer = document.getElementById('dashboard-chart-months');
-        const chartSvg = document.getElementById('dashboard-chart-svg');
-        const tooltip = document.getElementById('dashboard-tooltip');
-        const showLowStockButton = document.getElementById('dashboard-show-low-stock');
-
-        const escapeHtml = (value) => String(value ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-
-        const formatCompact = (value) => {
-            const amount = Number(value || 0);
-            if (amount >= 1000000) {
-                return `Rp ${(amount / 1000000).toFixed(1).replace('.0', '')} Jt`;
-            }
-            if (amount >= 1000) {
-                return `Rp ${(amount / 1000).toFixed(0)} Rb`;
-            }
-            return `Rp ${amount}`;
-        };
-
-        const buildMonthSeries = (transactions) => {
-            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-            const currentYear = new Date().getFullYear();
-            const totals = new Array(12).fill(0);
-
-            transactions.forEach((transaction) => {
-                const date = new Date(transaction.createdAt);
-                if (Number.isNaN(date.getTime()) || date.getFullYear() !== currentYear) {
-                    return;
-                }
-                totals[date.getMonth()] += Number(transaction.total || 0);
-            });
-
-            return labels.map((label, index) => ({ label, value: totals[index] }));
-        };
-
-        const renderChart = (series) => {
-            const maxValue = Math.max(...series.map(item => item.value), 1);
-            const roundedMax = Math.ceil(maxValue / 1000000) * 1000000;
-            const stepValue = Math.max(roundedMax / 5, 1);
-
-            axisYContainer.innerHTML = [5, 4, 3, 2, 1, 0].map(step => `<span>${formatCompact(step * stepValue)}</span>`).join('');
-            monthsContainer.innerHTML = series.map(item => `<span>${item.label}</span>`).join('');
-
-            const pointGap = 720 / (series.length - 1);
-            const points = series.map((item, index) => {
-                const x = index * pointGap;
-                const y = 208 - ((item.value / (stepValue * 5)) * 180);
-                return { ...item, x, y: Number.isFinite(y) ? y : 208 };
-            });
-
-            const linePath = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
-            chartSvg.innerHTML = `
-                <path d="${linePath}" fill="none" stroke="#7a4f2f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-                ${points.map(point => `
-                    <g class="chart-point" data-label="${point.label}" data-value="${store.formatRupiah(point.value)}">
-                        <circle cx="${point.x}" cy="${point.y}" r="7" fill="#7a4f2f"></circle>
-                        <circle cx="${point.x}" cy="${point.y}" r="13" fill="rgba(122, 79, 47, 0.12)"></circle>
-                    </g>
-                `).join('')}
-            `;
-
-            chartSvg.querySelectorAll('.chart-point').forEach(point => {
-                point.addEventListener('mouseenter', () => {
-                    tooltip.innerHTML = `<strong>${point.dataset.label} ${new Date().getFullYear()}</strong><br>${point.dataset.value}`;
-                    tooltip.classList.add('active');
-                });
-                point.addEventListener('mouseleave', () => {
-                    tooltip.classList.remove('active');
-                });
-            });
-        };
-
-        const renderLowStockTable = (items) => {
-            if (!items.length) {
-                lowStockContent.innerHTML = '<div class="dashboard-empty">Tidak ada barang dengan stok menipis saat ini.</div>';
-                return;
-            }
-
-            lowStockContent.innerHTML = `
-                <div style="overflow-x:auto;">
-                    <table class="dashboard-low-stock-table">
-                        <thead>
-                            <tr>
-                                <th>Produk</th>
-                                <th>Kategori</th>
-                                <th>Stok Tersisa</th>
-                                <th>Batas Minimum</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${items.slice(0, 5).map(item => `
-                                <tr>
-                                    <td>${escapeHtml(item.namaItem || '-')}</td>
-                                    <td>${escapeHtml(item.__kategori || item.__lokasi || '-')}</td>
-                                    <td>${escapeHtml(String(item.currentStock || 0))}</td>
-                                    <td>5</td>
-                                    <td><span class="dashboard-status-pill ${Number(item.currentStock || 0) <= 2 ? 'danger' : 'warning'}">${Number(item.currentStock || 0) <= 2 ? 'Hampir Habis' : 'Stok Rendah'}</span></td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        };
-
-        try {
-            const [summary, transactions, report, effectiveItems] = await Promise.all([
-                store.getDashboardSummary(),
-                Promise.resolve(store.getTransactions()),
-                store.getReport('', ''),
-                store.getEffectiveItems()
-            ]);
-            const customerCount = new Set(transactions.map(transaction => (transaction.customerName || 'Pelanggan Umum').trim()).filter(Boolean)).size;
-            const monthSeries = buildMonthSeries(transactions);
-
-            metricsContainer.innerHTML = [
-                {
-                    title: 'Total Produk',
-                    value: summary.totalProduk,
-                    note: 'Produk aktif',
-                    icon: 'fa-box',
-                    iconStyle: 'background:#f6eee3;color:#8a5a34;'
-                },
-                {
-                    title: 'Penjualan Hari Ini',
-                    value: store.formatRupiah(summary.penjualanHariIni),
-                    note: `${summary.transaksiHariIni} transaksi`,
-                    icon: 'fa-cart-shopping',
-                    iconStyle: 'background:#fdeceb;color:#e05a47;'
-                },
-                {
-                    title: 'Total Pelanggan',
-                    value: customerCount,
-                    note: 'Pelanggan tercatat',
-                    icon: 'fa-users',
-                    iconStyle: 'background:#e8f7ee;color:#2a8b57;'
-                },
-                {
-                    title: 'Stok Menipis',
-                    value: summary.stokMenipis,
-                    note: 'Produk perlu restock',
-                    action: 'low-stock',
-                    icon: 'fa-box-open',
-                    iconStyle: 'background:#fff2d8;color:#ba7b12;'
-                }
-            ].map(card => `
-                <div class="dashboard-card ${card.action ? 'is-clickable' : ''}" ${card.action ? `data-action="${card.action}"` : ''}>
-                    <div class="dashboard-card-icon" style="${card.iconStyle}"><i class="fas ${card.icon}"></i></div>
-                    <div>
-                        <h4>${card.title}</h4>
-                        <strong>${card.value}</strong>
-                        <span>${card.note}</span>
-                    </div>
-                </div>
-            `).join('');
-
-            renderChart(monthSeries);
-            renderLowStockTable(summary.lowStockItems || []);
-
-            if (!report.topItems.length) {
-                topProductsContainer.innerHTML = '<div class="dashboard-empty">Belum ada produk terlaris karena transaksi masih kosong.</div>';
-            } else {
-                const highestQty = Math.max(...report.topItems.slice(0, 5).map(item => Number(item.qty || 0)), 1);
-                topProductsContainer.innerHTML = report.topItems.slice(0, 5).map((item, index) => `
-                    <div class="dashboard-product-row">
-                        <span class="dashboard-rank ${index === 0 ? 'is-top' : ''}">${index + 1}</span>
-                        <div class="dashboard-product-meta">
-                            <div class="dashboard-product-name">${escapeHtml(item.namaItem || '-')}</div>
-                            <div class="dashboard-progress"><span style="width:${Math.max(16, Math.round((Number(item.qty || 0) / highestQty) * 100))}%;"></span></div>
-                        </div>
-                        <div class="dashboard-product-value">${escapeHtml(String(item.qty || 0))} Terjual</div>
-                    </div>
-                `).join('');
-            }
-
-            const activityItems = [
-                ...summary.lowStockItems.slice(0, 2).map(item => ({
-                    type: 'stock-alert',
-                    createdAt: new Date().toISOString(),
-                    title: 'Notifikasi stok minimum',
-                    detail: `${item.namaItem} tersisa ${item.currentStock} pcs`,
-                    role: 'Admin'
-                })),
-                ...summary.transaksiTerbaru.map(transaction => ({
-                    type: 'transaction',
-                    createdAt: transaction.createdAt,
-                    title: `Transaksi #${transaction.invoiceNumber} berhasil`,
-                    detail: `Total ${store.formatRupiah(transaction.total)}`,
-                    role: transaction.cashierName || 'Kasir'
-                })),
-                ...effectiveItems.filter(item => Number(item.stokTambahan || 0) > 0).slice(0, 2).map(item => ({
-                    type: 'stock-in',
-                    createdAt: new Date().toISOString(),
-                    title: 'Stok masuk dicatat',
-                    detail: `${item.namaItem} + ${item.stokTambahan} pcs`,
-                    role: 'Admin'
-                }))
-            ].sort((left, right) => new Date(right.createdAt) - new Date(left.createdAt)).slice(0, 5);
-
-            if (!activityItems.length) {
-                activitiesContainer.innerHTML = '<div class="dashboard-empty">Belum ada aktivitas terbaru.</div>';
-            } else {
-                const activityMeta = {
-                    transaction: { icon: 'fa-cart-shopping', bg: '#edf4ff', color: '#3368bf' },
-                    'stock-in': { icon: 'fa-box', bg: '#e8f7ee', color: '#2a8b57' },
-                    'stock-alert': { icon: 'fa-arrow-down', bg: '#fdeceb', color: '#c95145' }
-                };
-
-                activitiesContainer.innerHTML = activityItems.map(activity => {
-                    const meta = activityMeta[activity.type] || activityMeta.transaction;
-                    const time = new Date(activity.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
-                    return `
-                        <div class="dashboard-activity-item">
-                            <div class="dashboard-activity-time">${time}</div>
-                            <div class="dashboard-activity-icon" style="background:${meta.bg};color:${meta.color};"><i class="fas ${meta.icon}"></i></div>
-                            <div class="dashboard-activity-copy">
-                                <strong>${escapeHtml(activity.title)}</strong>
-                                <small>${escapeHtml(activity.detail)}</small>
-                            </div>
-                            <span class="dashboard-role-pill">${escapeHtml(activity.role)}</span>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            metricsContainer.addEventListener('click', (event) => {
-                const card = event.target.closest('[data-action="low-stock"]');
-                if (!card) {
-                    return;
-                }
-                showLowStockButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
-
-            showLowStockButton.addEventListener('click', () => {
-                lowStockContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
-        } catch (error) {
-            metricsContainer.innerHTML = `<div class="dashboard-card"><h4>Error</h4><strong>Gagal</strong><span>${error.message}</span></div>`;
-            topProductsContainer.innerHTML = '';
-            activitiesContainer.innerHTML = '';
-            lowStockContent.innerHTML = '';
-        }
-    })();
-</script>
+<script src="pages/dashboard.js?v=20260708"></script>

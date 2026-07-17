@@ -3,6 +3,8 @@
     const STORAGE_KEY = 'enrekang-transactions-v1';
     const STOCK_ADJUSTMENT_KEY = 'enrekang-stock-adjustments-v1';
     const STOCK_ACTIVITY_KEY = 'enrekang-stock-activities-v1';
+    const CUSTOM_ITEMS_KEY = 'enrekang-custom-items-v1';
+    const TIME_SETTINGS_KEY = 'enrekang-time-settings-v1';
     const DATA_URL = 'data.json';
     const DAY_FORMATTER = new Intl.DateTimeFormat('id-ID', {
         day: '2-digit',
@@ -37,7 +39,53 @@
         return DAY_FORMATTER.format(new Date(value));
     }
 
-    function getLocalDateString(value = new Date()) {
+    function readTimeSettings() {
+        try {
+            const raw = localStorage.getItem(TIME_SETTINGS_KEY);
+            if (!raw) {
+                return {
+                    mode: 'auto',
+                    manualBase: '',
+                    syncedAt: ''
+                };
+            }
+
+            const parsed = JSON.parse(raw);
+            return {
+                mode: parsed.mode === 'manual' ? 'manual' : 'auto',
+                manualBase: typeof parsed.manualBase === 'string' ? parsed.manualBase : '',
+                syncedAt: typeof parsed.syncedAt === 'string' ? parsed.syncedAt : ''
+            };
+        } catch (error) {
+            console.error('Gagal membaca pengaturan waktu:', error);
+            return {
+                mode: 'auto',
+                manualBase: '',
+                syncedAt: ''
+            };
+        }
+    }
+
+    function getCurrentConfiguredDate() {
+        const settings = readTimeSettings();
+
+        if (settings.mode === 'manual' && settings.manualBase) {
+            const manualBaseTime = new Date(settings.manualBase).getTime();
+            const syncedAtTime = new Date(settings.syncedAt || settings.manualBase).getTime();
+
+            if (!Number.isNaN(manualBaseTime) && !Number.isNaN(syncedAtTime)) {
+                return new Date(manualBaseTime + (Date.now() - syncedAtTime));
+            }
+        }
+
+        return new Date();
+    }
+
+    function getCurrentConfiguredTimestamp() {
+        return getCurrentConfiguredDate().toISOString();
+    }
+
+    function getLocalDateString(value = getCurrentConfiguredDate()) {
         const date = value instanceof Date ? value : new Date(value);
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -99,7 +147,7 @@
         return cloneNode(await sourceDataPromise);
     }
 
-    async function getSourceItems() {
+    async function getBaseSourceItems() {
         if (!sourceItemsPromise) {
             sourceItemsPromise = getSourceData().then((data) => {
                 const collector = [];
@@ -108,6 +156,33 @@
             });
         }
         return (await sourceItemsPromise).map((item) => ({ ...item }));
+    }
+
+    function getCustomItems() {
+        try {
+            const raw = localStorage.getItem(CUSTOM_ITEMS_KEY);
+            if (!raw) {
+                return [];
+            }
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+            console.error('Gagal membaca barang lokal tambahan:', error);
+            return [];
+        }
+    }
+
+    function saveCustomItems(items) {
+        localStorage.setItem(CUSTOM_ITEMS_KEY, JSON.stringify(items));
+        emitStockEvent();
+    }
+
+    async function getSourceItems() {
+        const [baseItems, customItems] = await Promise.all([
+            getBaseSourceItems(),
+            Promise.resolve(getCustomItems())
+        ]);
+        return [...baseItems, ...customItems].map((item) => ({ ...item }));
     }
 
     function getTransactions() {
@@ -343,14 +418,14 @@
         }
 
         const transactions = getSortedTransactions();
-        const createdAt = new Date().toISOString();
+        const createdAt = getCurrentConfiguredTimestamp();
         const transaction = {
             id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             invoiceNumber: buildInvoiceNumber(transactions, createdAt),
             createdAt,
             cashierName: payload.cashierName || 'Kasir',
-            customerName: payload.customerName || 'Pelanggan Umum',
-            notes: payload.notes || '',
+            customerName: String(payload.customerName || '').trim(),
+            notes: String(payload.notes || '').trim(),
             paymentAmount,
             total,
             changeAmount: paymentAmount - total,
@@ -371,6 +446,39 @@
         if (nextTransactions.length === transactions.length) {
             throw new Error('Transaksi yang ingin dihapus tidak ditemukan.');
         }
+
+        saveTransactions(nextTransactions);
+    }
+
+    function deleteTransactionItem(transactionId, itemKey) {
+        const transactions = getTransactions();
+        const nextTransactions = transactions.flatMap((transaction) => {
+            if (transaction.id !== transactionId) {
+                return [transaction];
+            }
+
+            const nextItems = (transaction.items || []).filter((item) => item.itemKey !== itemKey);
+            if (nextItems.length === (transaction.items || []).length) {
+                throw new Error('Item transaksi yang ingin dihapus tidak ditemukan.');
+            }
+
+            if (!nextItems.length) {
+                return [];
+            }
+
+            const total = nextItems.reduce((sum, item) => sum + Number(item.subtotal || 0), 0);
+            const totalCost = nextItems.reduce((sum, item) => sum + (Number(item.qty || 0) * Number(item.hargaPokok || 0)), 0);
+            const totalItems = nextItems.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+
+            return [{
+                ...transaction,
+                items: nextItems,
+                total,
+                totalCost,
+                totalItems,
+                changeAmount: Math.max(0, Number(transaction.paymentAmount || 0) - total)
+            }];
+        });
 
         saveTransactions(nextTransactions);
     }
@@ -396,7 +504,7 @@
         stockActivities.unshift({
             id: `stock-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             type: 'stock-in',
-            createdAt: new Date().toISOString(),
+            createdAt: getCurrentConfiguredTimestamp(),
             itemKey,
             kodeItem: item?.kodeItem || '',
             barcode: item?.barcode || '',
@@ -406,6 +514,146 @@
         });
         saveStockActivities(stockActivities.slice(0, 100));
         return adjustments[itemKey];
+    }
+
+    async function setStock(itemKey, quantity) {
+        const normalizedQty = Number(quantity);
+        if (!Number.isFinite(normalizedQty) || normalizedQty < 0) {
+            throw new Error('Stok akhir harus berupa angka 0 atau lebih besar.');
+        }
+
+        const targetQty = Math.round(normalizedQty);
+        const items = await getEffectiveItems();
+        const item = items.find((entry) => entry.__itemKey === itemKey);
+        if (!item) {
+            throw new Error('Barang yang ingin diubah stoknya tidak ditemukan.');
+        }
+
+        const currentQty = Number(item.currentStock || 0);
+        const delta = targetQty - currentQty;
+        const nextAdjustment = targetQty + Number(item.stokTerjual || 0) - Number(item.stokAwal || 0);
+        const adjustments = getStockAdjustments();
+
+        if (nextAdjustment === 0) {
+            delete adjustments[itemKey];
+        } else {
+            adjustments[itemKey] = nextAdjustment;
+        }
+
+        saveStockAdjustments(adjustments);
+
+        if (delta !== 0) {
+            const stockActivities = getStockActivities();
+            stockActivities.unshift({
+                id: `stock-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                type: 'stock-set',
+                createdAt: getCurrentConfiguredTimestamp(),
+                itemKey,
+                kodeItem: item.kodeItem || '',
+                barcode: item.barcode || '',
+                namaItem: item.namaItem || '',
+                lokasi: item.__path || '',
+                previousQuantity: currentQty,
+                targetQuantity: targetQty,
+                quantity: delta
+            });
+            saveStockActivities(stockActivities.slice(0, 100));
+        }
+
+        return targetQty;
+    }
+
+    async function addCustomItem(payload) {
+        const baseItems = await getBaseSourceItems();
+        const customItems = getCustomItems();
+        const allItems = [...baseItems, ...customItems];
+
+        const namaItem = String(payload.namaItem || '').trim();
+        const kodeItem = String(payload.kodeItem || '').trim();
+        const barcode = String(payload.barcode || '').trim();
+        const lokasi = String(payload.lokasi || '').trim();
+        const kategori = String(payload.kategori || '').trim();
+        const hargaPokok = Number(payload.hargaPokok || 0);
+        const hargaJual = Number(payload.hargaJual || 0);
+        const stok = Number(payload.stok || 0);
+
+        if (!namaItem) {
+            throw new Error('Nama barang wajib diisi.');
+        }
+        if (!lokasi) {
+            throw new Error('Lokasi wajib diisi.');
+        }
+        if (!kategori) {
+            throw new Error('Kategori wajib diisi.');
+        }
+        if (!Number.isFinite(stok) || stok < 0 || !Number.isInteger(stok)) {
+            throw new Error('Stok awal harus berupa bilangan bulat 0 atau lebih besar.');
+        }
+        if (!Number.isFinite(hargaPokok) || hargaPokok < 0) {
+            throw new Error('Harga pokok harus berupa angka 0 atau lebih besar.');
+        }
+        if (!Number.isFinite(hargaJual) || hargaJual < 0) {
+            throw new Error('Harga jual harus berupa angka 0 atau lebih besar.');
+        }
+
+        const nextPath = [lokasi, kategori].filter(Boolean).join(' / ');
+        const itemKeyCandidate = getItemKey({
+            barcode,
+            kodeItem,
+            __path: nextPath,
+            namaItem
+        });
+
+        const duplicate = allItems.find((item) => {
+            if (barcode && item.barcode === barcode) {
+                return true;
+            }
+            if (kodeItem && item.kodeItem === kodeItem) {
+                return true;
+            }
+            return item.__itemKey === itemKeyCandidate;
+        });
+
+        if (duplicate) {
+            throw new Error('Barang dengan kode, barcode, atau identitas yang sama sudah ada.');
+        }
+
+        const customItem = {
+            kodeItem,
+            barcode,
+            namaItem,
+            hargaPokok,
+            hargaJual,
+            stok,
+            __path: nextPath,
+            __lokasi: lokasi,
+            __kategori: kategori,
+            __itemKey: itemKeyCandidate,
+            __isCustom: true,
+            __createdAt: getCurrentConfiguredTimestamp()
+        };
+
+        saveCustomItems([customItem, ...customItems]);
+
+        if (stok > 0) {
+            const stockActivities = getStockActivities();
+            stockActivities.unshift({
+                id: `stock-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                type: 'stock-create',
+                createdAt: getCurrentConfiguredTimestamp(),
+                itemKey: customItem.__itemKey,
+                kodeItem,
+                barcode,
+                namaItem,
+                lokasi: nextPath,
+                previousQuantity: 0,
+                targetQuantity: stok,
+                quantity: stok
+            });
+            saveStockActivities(stockActivities.slice(0, 100));
+        }
+
+        return { ...customItem };
     }
 
     function getTransactionsInRange(startDate, endDate) {
@@ -448,6 +696,7 @@
         });
 
         const itemsByName = {};
+        const lineItems = [];
         transactions.forEach((transaction) => {
             transaction.items.forEach((item) => {
                 const key = item.itemKey;
@@ -461,6 +710,18 @@
                 }
                 itemsByName[key].qty += Number(item.qty || 0);
                 itemsByName[key].omzet += Number(item.subtotal || 0);
+
+                lineItems.push({
+                    transactionId: transaction.id,
+                    itemKey: item.itemKey,
+                    namaItem: item.namaItem,
+                    customerName: String(transaction.customerName || '').trim() === 'Pelanggan Umum' ? '' : String(transaction.customerName || '').trim(),
+                    barcode: item.barcode || '',
+                    qty: Number(item.qty || 0),
+                    omzet: Number(item.subtotal || 0),
+                    notes: String(transaction.notes || '').trim(),
+                    createdAt: transaction.createdAt
+                });
             });
         });
 
@@ -470,6 +731,7 @@
                 ...summary,
                 labaKotor: summary.totalOmzet - summary.totalModal
             },
+            lineItems: lineItems.sort((left, right) => new Date(right.createdAt) - new Date(left.createdAt)),
             topItems: Object.values(itemsByName)
                 .sort((left, right) => right.qty - left.qty)
                 .slice(0, 10)
@@ -496,7 +758,10 @@
         getTransactionsInRange,
         createTransaction,
         deleteTransaction,
+        deleteTransactionItem,
         addStock,
+        setStock,
+        addCustomItem,
         getDashboardSummary,
         getReport,
         clearTransactions

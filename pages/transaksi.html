@@ -143,14 +143,17 @@
             `).join('');
         }
 
-        container.addEventListener('click', (event) => {
+        container.addEventListener('click', async (event) => {
             const button = event.target.closest('.transaction-delete');
             if (!button) {
                 return;
             }
 
             const transactionId = button.dataset.transactionId;
-            const confirmed = window.confirm('Hapus transaksi ini? Stok barang akan dikembalikan sesuai item yang dihapus.');
+            const confirmed = await window.showAppConfirm({
+                title: 'Konfirmasi Hapus Transaksi',
+                message: 'Transaksi ini akan dihapus permanen. Stok barang akan dikembalikan sesuai item yang dihapus. Lanjutkan?'
+            });
             if (!confirmed) {
                 return;
             }

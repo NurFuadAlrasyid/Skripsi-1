@@ -18,7 +18,7 @@
 
     .stok-overview {
         display: grid;
-        grid-template-columns: repeat(5, minmax(185px, 1fr));
+        grid-template-columns: repeat(4, minmax(185px, 1fr));
         gap: 16px;
     }
 
@@ -108,6 +108,16 @@
     .stok-panel-head h3 {
         color: #2b2f35;
         font-size: 18px;
+    }
+
+    .stok-panel-head-copy {
+        display: grid;
+        gap: 4px;
+    }
+
+    .stok-panel-head-copy small {
+        color: #8a9099;
+        font-size: 12px;
     }
 
     .stok-select,
@@ -532,6 +542,116 @@
         color: #8a9099;
     }
 
+    .stok-edit-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(34, 24, 16, 0.34);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 320;
+    }
+
+    .stok-edit-modal.is-open {
+        display: flex;
+    }
+
+    .stok-edit-dialog {
+        width: min(460px, 100%);
+        background: #fffdf9;
+        border-radius: 20px;
+        border: 1px solid #ead8c3;
+        box-shadow: 0 24px 44px rgba(70, 40, 18, 0.2);
+        padding: 22px;
+        display: grid;
+        gap: 16px;
+    }
+
+    .stok-edit-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: start;
+    }
+
+    .stok-edit-head h3 {
+        color: #2b2f35;
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .stok-edit-head p,
+    .stok-edit-detail,
+    .stok-edit-summary {
+        color: #7e858f;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .stok-edit-close {
+        width: 34px;
+        height: 34px;
+        border: 1px solid #ead8c3;
+        border-radius: 10px;
+        background: #fff7ee;
+        color: #8a5a34;
+        cursor: pointer;
+    }
+
+    .stok-edit-form {
+        display: grid;
+        gap: 14px;
+    }
+
+    .stok-edit-form label {
+        display: grid;
+        gap: 6px;
+        color: #5a606a;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .stok-edit-form input {
+        border: 1px solid #ddd4ca;
+        border-radius: 12px;
+        padding: 11px 12px;
+        font: inherit;
+        background: #fffdf9;
+        color: #2b2f35;
+    }
+
+    .stok-edit-error {
+        display: none;
+        padding: 11px 12px;
+        border-radius: 12px;
+        background: #fdeceb;
+        color: #b64136;
+        border: 1px solid #f7d0cd;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .stok-edit-error.active {
+        display: block;
+    }
+
+    .stok-edit-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .stok-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .stok-form-grid .full {
+        grid-column: 1 / -1;
+    }
+
     @media (max-width: 1240px) {
         .stok-overview {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -638,6 +758,10 @@
             flex-direction: column;
             align-items: flex-start;
         }
+
+        .stok-form-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
@@ -681,7 +805,11 @@
 
     <section id="stok-management-panel" class="stok-panel stok-management">
         <div class="stok-panel-head">
-            <h2>Manajemen Stok</h2>
+            <div class="stok-panel-head-copy">
+                <h2>Manajemen Stok</h2>
+                <small id="stock-list-mode-label">Menampilkan semua daftar barang.</small>
+            </div>
+            <button id="stock-add-item-button" type="button" class="stok-button primary"><i class="fas fa-plus"></i> Tambah Barang</button>
         </div>
 
         <div class="stok-toolbar">
@@ -702,6 +830,94 @@
     </section>
 </div>
 
+<div id="stok-add-item-modal" class="stok-edit-modal" aria-hidden="true">
+    <div class="stok-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="stok-add-item-title">
+        <div class="stok-edit-head">
+            <div>
+                <h3 id="stok-add-item-title">Tambah Barang Baru</h3>
+                <p>Tambahkan jenis stok baru ke data lokal aplikasi.</p>
+            </div>
+            <button id="stok-add-item-close" type="button" class="stok-edit-close" aria-label="Tutup tambah barang">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div id="stok-add-item-error" class="stok-edit-error"></div>
+
+        <form id="stok-add-item-form" class="stok-edit-form">
+            <div class="stok-form-grid">
+                <label class="full" for="stok-add-item-name">
+                    Nama Barang
+                    <input id="stok-add-item-name" type="text" required>
+                </label>
+                <label for="stok-add-item-code">
+                    Kode Barang
+                    <input id="stok-add-item-code" type="text" placeholder="Opsional">
+                </label>
+                <label for="stok-add-item-barcode">
+                    Barcode
+                    <input id="stok-add-item-barcode" type="text" placeholder="Opsional">
+                </label>
+                <label for="stok-add-item-location">
+                    Lokasi
+                    <input id="stok-add-item-location" type="text" required placeholder="Contoh: Sparepart">
+                </label>
+                <label for="stok-add-item-category">
+                    Kategori
+                    <input id="stok-add-item-category" type="text" required placeholder="Contoh: STIHL">
+                </label>
+                <label for="stok-add-item-stock">
+                    Stok Awal
+                    <input id="stok-add-item-stock" type="number" min="0" step="1" required>
+                </label>
+                <label for="stok-add-item-cost">
+                    Harga Pokok
+                    <input id="stok-add-item-cost" type="number" min="0" step="1" required>
+                </label>
+                <label for="stok-add-item-price">
+                    Harga Jual
+                    <input id="stok-add-item-price" type="number" min="0" step="1" required>
+                </label>
+            </div>
+
+            <div class="stok-edit-actions">
+                <button id="stok-add-item-cancel" type="button" class="stok-button secondary">Batal</button>
+                <button type="submit" class="stok-button primary">Simpan Barang</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="stok-edit-modal" class="stok-edit-modal" aria-hidden="true">
+    <div class="stok-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="stok-edit-title">
+        <div class="stok-edit-head">
+            <div>
+                <h3 id="stok-edit-title">Edit Stok Barang</h3>
+                <p>Ubah stok akhir barang yang tampil di halaman stok.</p>
+            </div>
+            <button id="stok-edit-close" type="button" class="stok-edit-close" aria-label="Tutup edit stok">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div id="stok-edit-detail" class="stok-edit-detail"></div>
+        <div id="stok-edit-summary" class="stok-edit-summary"></div>
+        <div id="stok-edit-error" class="stok-edit-error"></div>
+
+        <form id="stok-edit-form" class="stok-edit-form">
+            <label for="stok-edit-quantity">
+                Stok Saat Ini
+                <input id="stok-edit-quantity" type="number" min="0" step="1" required>
+            </label>
+
+            <div class="stok-edit-actions">
+                <button id="stok-edit-cancel" type="button" class="stok-button secondary">Batal</button>
+                <button type="submit" class="stok-button primary">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="app-store.js?v=20260701"></script>
 <script>
     (() => {
@@ -716,7 +932,9 @@
             pageWindowStart: 1,
             searchQuery: '',
             categoryFilter: 'all',
-            chartScope: 'all'
+            chartScope: 'all',
+            stockListMode: 'all',
+            editingItemKey: ''
         };
 
         const overviewContainer = document.getElementById('stok-overview');
@@ -733,6 +951,29 @@
         const tableWrapper = document.getElementById('stock-table-wrapper');
         const tableInfo = document.getElementById('stock-table-info');
         const pagination = document.getElementById('stock-pagination');
+        const stockListModeLabel = document.getElementById('stock-list-mode-label');
+        const addItemButton = document.getElementById('stock-add-item-button');
+        const addItemModal = document.getElementById('stok-add-item-modal');
+        const addItemCloseButton = document.getElementById('stok-add-item-close');
+        const addItemCancelButton = document.getElementById('stok-add-item-cancel');
+        const addItemForm = document.getElementById('stok-add-item-form');
+        const addItemError = document.getElementById('stok-add-item-error');
+        const addItemNameInput = document.getElementById('stok-add-item-name');
+        const addItemCodeInput = document.getElementById('stok-add-item-code');
+        const addItemBarcodeInput = document.getElementById('stok-add-item-barcode');
+        const addItemLocationInput = document.getElementById('stok-add-item-location');
+        const addItemCategoryInput = document.getElementById('stok-add-item-category');
+        const addItemStockInput = document.getElementById('stok-add-item-stock');
+        const addItemCostInput = document.getElementById('stok-add-item-cost');
+        const addItemPriceInput = document.getElementById('stok-add-item-price');
+        const editModal = document.getElementById('stok-edit-modal');
+        const editCloseButton = document.getElementById('stok-edit-close');
+        const editCancelButton = document.getElementById('stok-edit-cancel');
+        const editForm = document.getElementById('stok-edit-form');
+        const editQuantityInput = document.getElementById('stok-edit-quantity');
+        const editDetail = document.getElementById('stok-edit-detail');
+        const editSummary = document.getElementById('stok-edit-summary');
+        const editError = document.getElementById('stok-edit-error');
 
         const chartColors = ['#61c28b', '#ff7a33', '#f5c247', '#8b7be0', '#6da9e4', '#ef8fbb', '#4dc3c7', '#b89b7f'];
 
@@ -753,6 +994,22 @@
             .replace(/'/g, '&#39;');
 
         const formatNumber = (value) => new Intl.NumberFormat('id-ID').format(Number(value || 0));
+
+        const getStockListModeLabel = () => {
+            if (state.stockListMode === 'low') {
+                return 'Menampilkan daftar barang untuk kategori stok menipis.';
+            }
+
+            if (state.stockListMode === 'out') {
+                return 'Menampilkan daftar barang untuk kategori stok habis.';
+            }
+
+            return 'Menampilkan semua daftar barang.';
+        };
+
+        const syncStockListModeLabel = () => {
+            stockListModeLabel.textContent = getStockListModeLabel();
+        };
 
         const getCategoryLabel = (item) => {
             const rawCategory = String(item.__kategori || '').split(' / ')[0].trim();
@@ -783,6 +1040,62 @@
         const clearMessage = () => {
             messageBox.className = 'stok-message';
             messageBox.textContent = '';
+        };
+
+        const setEditError = (message = '') => {
+            editError.textContent = message;
+            editError.className = message ? 'stok-edit-error active' : 'stok-edit-error';
+        };
+
+        const setAddItemError = (message = '') => {
+            addItemError.textContent = message;
+            addItemError.className = message ? 'stok-edit-error active' : 'stok-edit-error';
+        };
+
+        const getItemByKey = (itemKey) => state.items.find((item) => item.__itemKey === itemKey);
+
+        const closeEditStockModal = () => {
+            state.editingItemKey = '';
+            editModal.classList.remove('is-open');
+            editModal.setAttribute('aria-hidden', 'true');
+            setEditError('');
+            editForm.reset();
+        };
+
+        const openAddItemModal = () => {
+            addItemModal.classList.add('is-open');
+            addItemModal.setAttribute('aria-hidden', 'false');
+            setAddItemError('');
+            addItemForm.reset();
+            addItemStockInput.value = '0';
+            addItemCostInput.value = '0';
+            addItemPriceInput.value = '0';
+            addItemNameInput.focus();
+        };
+
+        const closeAddItemModal = () => {
+            addItemModal.classList.remove('is-open');
+            addItemModal.setAttribute('aria-hidden', 'true');
+            setAddItemError('');
+            addItemForm.reset();
+        };
+
+        const openEditStockModal = (itemKey) => {
+            const item = getItemByKey(itemKey);
+            if (!item) {
+                setMessage('Barang yang ingin diedit tidak ditemukan.', 'error');
+                return;
+            }
+
+            state.editingItemKey = itemKey;
+            editDetail.innerHTML = `<strong>${escapeHtml(item.namaItem || '-')}</strong><br>${escapeHtml(item.__path || '-')}<br>Kode: ${escapeHtml(item.kodeItem || '-')} | Barcode: ${escapeHtml(item.barcode || '-')}`;
+            editSummary.textContent = `Stok awal ${formatNumber(item.stokAwal || 0)} • Terjual ${formatNumber(item.stokTerjual || 0)} • Penyesuaian lokal ${formatNumber(item.stokTambahan || 0)}`;
+            editQuantityInput.value = String(Number(item.currentStock || 0));
+            setEditError('');
+            editModal.classList.add('is-open');
+            editModal.setAttribute('aria-hidden', 'false');
+            editQuantityInput.focus();
+            editQuantityInput.select();
         };
 
         const buildTopProduct = (transactions) => {
@@ -821,6 +1134,16 @@
         const getFilteredItems = () => {
             const keyword = state.searchQuery.toLowerCase().trim();
             return state.items.filter((item) => {
+                const stockValue = Number(item.currentStock || 0);
+
+                if (state.stockListMode === 'low' && !(stockValue > 0 && stockValue <= 5)) {
+                    return false;
+                }
+
+                if (state.stockListMode === 'out' && stockValue > 0) {
+                    return false;
+                }
+
                 if (state.categoryFilter !== 'all' && getCategoryLabel(item) !== state.categoryFilter) {
                     return false;
                 }
@@ -845,7 +1168,6 @@
         const renderOverview = () => {
             const lowStockItems = state.items.filter((item) => Number(item.currentStock || 0) > 0 && Number(item.currentStock || 0) <= 5);
             const outOfStockItems = state.items.filter((item) => Number(item.currentStock || 0) <= 0);
-            const totalStockValue = state.items.reduce((sum, item) => sum + (Number(item.currentStock || 0) * Number(item.hargaJual || 0)), 0);
             const topProduct = buildTopProduct(state.transactions);
             const categories = buildCategoryStats(state.items);
 
@@ -859,21 +1181,14 @@
                     target: 'stok-management-panel'
                 },
                 {
-                    title: 'Nilai Total Stok',
-                    value: formatRupiah(totalStockValue),
-                    note: 'Perkiraan nilai jual',
-                    icon: 'fa-sack-dollar',
-                    iconStyle: 'background:#fff2d8;color:#ba7b12;',
-                    target: 'stok-management-panel'
-                },
-                {
                     title: 'Stok Menipis',
                     value: formatNumber(lowStockItems.length),
                     note: 'Produk',
                     icon: 'fa-triangle-exclamation',
                     iconStyle: 'background:#fff3ef;color:#e16b34;',
                     target: 'stok-low-stock-panel',
-                    link: 'Lihat detail'
+                    link: 'Lihat detail',
+                    stockView: 'low'
                 },
                 {
                     title: 'Stok Habis',
@@ -882,7 +1197,8 @@
                     icon: 'fa-circle-xmark',
                     iconStyle: 'background:#fdeceb;color:#c85349;',
                     target: 'stok-management-panel',
-                    link: 'Lihat detail'
+                    link: 'Lihat detail',
+                    stockView: 'out'
                 },
                 {
                     title: 'Produk Terlaris',
@@ -898,7 +1214,7 @@
                         <h3>${card.title}</h3>
                         <strong>${card.value}</strong>
                         <span>${card.note}</span>
-                        ${card.link ? `<button type="button" class="stok-card-link" data-scroll-target="${card.target}">${card.link} <i class="fas fa-arrow-right"></i></button>` : ''}
+                        ${card.link ? `<button type="button" class="stok-card-link" data-scroll-target="${card.target}" data-stock-view="${card.stockView || 'all'}">${card.link} <i class="fas fa-arrow-right"></i></button>` : ''}
                     </div>
                     <div class="stok-card-icon" style="${card.iconStyle}"><i class="fas ${card.icon}"></i></div>
                 </article>
@@ -977,13 +1293,19 @@
                 })));
 
             const incomingActivities = state.stockActivities.map((activity) => ({
-                kind: 'positive',
+                kind: Number(activity.quantity || 0) >= 0 ? 'positive' : 'negative',
                 createdAt: activity.createdAt,
                 time: store.formatDateTime(activity.createdAt),
-                label: 'Stok Masuk',
+                label: activity.type === 'stock-set'
+                    ? 'Edit Stok'
+                    : (activity.type === 'stock-create' ? 'Barang Baru' : 'Stok Masuk'),
                 name: activity.namaItem,
-                detail: activity.lokasi || 'Penyesuaian lokal',
-                qty: `+${formatNumber(activity.quantity)} pcs`
+                detail: activity.type === 'stock-set'
+                    ? `${activity.lokasi || 'Penyesuaian lokal'} • ${formatNumber(activity.previousQuantity || 0)} menjadi ${formatNumber(activity.targetQuantity || 0)}`
+                    : (activity.type === 'stock-create'
+                        ? `${activity.lokasi || 'Penyesuaian lokal'} • stok awal ${formatNumber(activity.targetQuantity || 0)}`
+                        : (activity.lokasi || 'Penyesuaian lokal')),
+                qty: `${Number(activity.quantity || 0) >= 0 ? '+' : '-'}${formatNumber(Math.abs(Number(activity.quantity || 0)))} pcs`
             }));
 
             const activities = [...incomingActivities, ...transactionActivities]
@@ -1083,7 +1405,7 @@
                                     <td>${escapeHtml(item.__lokasi || '-')}</td>
                                     <td>
                                         <div class="stok-actions">
-                                            <button type="button" class="stok-action-icon" data-table-action="edit" data-item-name="${escapeHtml(item.namaItem || '-') }" title="Edit data visual">
+                                            <button type="button" class="stok-action-icon" data-table-action="edit" data-item-key="${escapeHtml(item.__itemKey)}" data-item-name="${escapeHtml(item.namaItem || '-') }" title="Edit stok barang">
                                                 <i class="fas fa-pen"></i>
                                             </button>
                                             <button type="button" class="stok-action-icon delete" data-table-action="delete" data-item-name="${escapeHtml(item.namaItem || '-') }" title="Hapus data visual">
@@ -1120,11 +1442,20 @@
         };
 
         const renderAll = () => {
+            syncStockListModeLabel();
             renderOverview();
             renderCategoryChart();
             renderLowStock();
             renderActivities();
             renderCategoryOptions();
+            renderTable();
+        };
+
+        const applyStockListMode = (mode) => {
+            state.stockListMode = mode;
+            state.currentPage = 1;
+            state.pageWindowStart = 1;
+            syncStockListModeLabel();
             renderTable();
         };
 
@@ -1160,6 +1491,64 @@
             }
         };
 
+        const handleEditStockSubmit = async (event) => {
+            event.preventDefault();
+
+            const item = getItemByKey(state.editingItemKey);
+            if (!item) {
+                setEditError('Barang yang ingin diedit tidak ditemukan.');
+                return;
+            }
+
+            const qty = Number(editQuantityInput.value);
+            if (!Number.isFinite(qty) || qty < 0 || !Number.isInteger(qty)) {
+                setEditError('Stok akhir harus berupa bilangan bulat 0 atau lebih besar.');
+                return;
+            }
+
+            if (qty === Number(item.currentStock || 0)) {
+                closeEditStockModal();
+                setMessage(`Tidak ada perubahan stok untuk ${item.namaItem}.`, 'success');
+                return;
+            }
+
+            try {
+                await store.setStock(state.editingItemKey, qty);
+                closeEditStockModal();
+                setMessage(`Stok ${item.namaItem} berhasil diperbarui menjadi ${qty}.`, 'success');
+                await refreshStockView();
+            } catch (error) {
+                setEditError(error.message);
+            }
+        };
+
+        const handleAddItemSubmit = async (event) => {
+            event.preventDefault();
+
+            try {
+                const item = await store.addCustomItem({
+                    namaItem: addItemNameInput.value,
+                    kodeItem: addItemCodeInput.value,
+                    barcode: addItemBarcodeInput.value,
+                    lokasi: addItemLocationInput.value,
+                    kategori: addItemCategoryInput.value,
+                    stok: addItemStockInput.value,
+                    hargaPokok: addItemCostInput.value,
+                    hargaJual: addItemPriceInput.value
+                });
+
+                closeAddItemModal();
+                setMessage(`Barang baru ${item.namaItem} berhasil ditambahkan.`, 'success');
+                state.searchQuery = item.namaItem;
+                searchInput.value = item.namaItem;
+                state.currentPage = 1;
+                state.pageWindowStart = 1;
+                await refreshStockView();
+            } catch (error) {
+                setAddItemError(error.message);
+            }
+        };
+
         searchButton.addEventListener('click', () => {
             clearMessage();
             state.searchQuery = searchInput.value;
@@ -1184,9 +1573,11 @@
             searchInput.value = '';
             state.searchQuery = '';
             state.categoryFilter = 'all';
+            state.stockListMode = 'all';
             categoryFilter.value = 'all';
             state.currentPage = 1;
             state.pageWindowStart = 1;
+            syncStockListModeLabel();
             renderTable();
         });
 
@@ -1241,18 +1632,35 @@
                 return;
             }
 
+            applyStockListMode(button.dataset.stockView || 'all');
+
             const target = document.getElementById(button.dataset.scrollTarget);
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
 
-        tableWrapper.addEventListener('click', (event) => {
+        tableWrapper.addEventListener('click', async (event) => {
             const visualAction = event.target.closest('[data-table-action]');
             if (visualAction) {
                 const action = visualAction.dataset.tableAction;
                 const itemName = visualAction.dataset.itemName || 'barang';
+                if (action === 'edit') {
+                    clearMessage();
+                    openEditStockModal(visualAction.dataset.itemKey || '');
+                    return;
+                }
+
                 const label = action === 'edit' ? 'Edit' : 'Hapus';
+                if (action === 'delete') {
+                    const confirmed = await window.showAppConfirm({
+                        title: 'Konfirmasi Hapus Barang',
+                        message: `${itemName} akan dihapus dari tampilan stok. Lanjutkan?`
+                    });
+                    if (!confirmed) {
+                        return;
+                    }
+                }
                 setMessage(`${label} untuk ${itemName} ditampilkan sebagai aksi visual dan belum mengubah data stok.`, 'success');
                 return;
             }
@@ -1260,6 +1668,40 @@
             const button = event.target.closest('.stok-add-button');
             if (button) {
                 handleAddStock(button);
+            }
+        });
+
+        addItemButton.addEventListener('click', () => {
+            clearMessage();
+            openAddItemModal();
+        });
+        addItemForm.addEventListener('submit', handleAddItemSubmit);
+        addItemCloseButton.addEventListener('click', closeAddItemModal);
+        addItemCancelButton.addEventListener('click', closeAddItemModal);
+        addItemModal.addEventListener('click', (event) => {
+            if (event.target === addItemModal) {
+                closeAddItemModal();
+            }
+        });
+        editForm.addEventListener('submit', handleEditStockSubmit);
+        editCloseButton.addEventListener('click', closeEditStockModal);
+        editCancelButton.addEventListener('click', closeEditStockModal);
+        editModal.addEventListener('click', (event) => {
+            if (event.target === editModal) {
+                closeEditStockModal();
+            }
+        });
+        window.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') {
+                return;
+            }
+
+            if (addItemModal.classList.contains('is-open')) {
+                closeAddItemModal();
+            }
+
+            if (editModal.classList.contains('is-open')) {
+                closeEditStockModal();
             }
         });
 

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Login | Enrekang Elektronik</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		:root {
+			--brown-900: #432413;
+			--brown-800: #5a331d;
+			--brown-700: #754324;
+			--brown-600: #8a5229;
+			--brown-500: #a66933;
+			--cream-100: #fbf5ed;
+			--cream-200: #f1e5d7;
+			--cream-300: #e4d2bf;
+			--text-900: #251910;
+			--text-700: #6f5a4b;
+			--shadow: 0 28px 70px rgba(19, 9, 4, 0.34);
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			min-height: 100vh;
+			font-family: 'Plus Jakarta Sans', sans-serif;
+			color: #ffffff;
+			background:
+				linear-gradient(135deg, rgba(25, 13, 6, 0.76), rgba(54, 29, 14, 0.72)),
+				radial-gradient(circle at top left, rgba(198, 148, 94, 0.24), transparent 30%),
+				url('foto_background_login.png') center center / cover no-repeat;
+		}
+
+		.login-page {
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 24px;
+		}
+
+		.login-panel-wrap {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+		}
+
+		.login-panel {
+			width: min(100%, 390px);
+			color: var(--text-900);
+			background: linear-gradient(180deg, rgba(255, 250, 244, 0.97) 0%, rgba(248, 239, 228, 0.95) 100%);
+			border: 1px solid rgba(255, 244, 233, 0.6);
+			box-shadow: var(--shadow);
+			backdrop-filter: blur(16px);
+			padding: 28px 26px 24px;
+			border-radius: 30px 52px 24px 46px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.login-panel::before {
+			content: '';
+			position: absolute;
+			inset: 0 0 auto auto;
+			width: 180px;
+			height: 180px;
+			background: radial-gradient(circle, rgba(201, 149, 93, 0.24), transparent 68%);
+			pointer-events: none;
+		}
+
+		.brand {
+			display: grid;
+			justify-items: center;
+			text-align: center;
+			gap: 8px;
+			margin-bottom: 22px;
+		}
+
+		.brand-logo {
+			width: 74px;
+			height: 74px;
+			object-fit: contain;
+			filter: drop-shadow(0 10px 22px rgba(97, 57, 20, 0.18));
+		}
+
+		.brand h1 {
+			font-size: 23px;
+			line-height: 1.2;
+			font-weight: 800;
+			color: var(--brown-900);
+		}
+
+		.brand p {
+			max-width: 280px;
+			font-size: 13px;
+			line-height: 1.6;
+			font-weight: 300;
+			color: var(--text-700);
+		}
+
+		.login-form {
+			display: grid;
+			gap: 16px;
+		}
+
+		.field-group {
+			display: grid;
+			gap: 8px;
+		}
+
+		.field-label {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			font-size: 14px;
+			font-weight: 600;
+			color: var(--brown-800);
+		}
+
+		.field-label i {
+			width: 16px;
+			font-size: 13px;
+			color: var(--brown-600);
+			text-align: center;
+		}
+
+		.field-input {
+			width: 100%;
+			border: 1px solid rgba(133, 91, 51, 0.18);
+			background: rgba(255, 255, 255, 0.86);
+			color: var(--text-900);
+			border-radius: 18px 24px 18px 24px;
+			padding: 15px 18px;
+			font: inherit;
+			font-size: 14px;
+			outline: none;
+			transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+		}
+
+		.field-input::placeholder {
+			color: #ab9785;
+		}
+
+		.field-input:focus {
+			border-color: rgba(138, 82, 41, 0.5);
+			box-shadow: 0 0 0 4px rgba(166, 105, 51, 0.12);
+			transform: translateY(-1px);
+		}
+
+		.form-status {
+			min-height: 22px;
+			font-size: 13px;
+			line-height: 1.5;
+			color: #9d2b2b;
+		}
+
+		.form-status.success {
+			color: #2f6b3a;
+		}
+
+		.login-button {
+			border: none;
+			border-radius: 20px 28px 20px 28px;
+			padding: 15px 18px;
+			font: inherit;
+			font-size: 15px;
+			font-weight: 700;
+			color: #ffffff;
+			cursor: pointer;
+			background: linear-gradient(135deg, var(--brown-700) 0%, var(--brown-500) 100%);
+			box-shadow: 0 18px 34px rgba(92, 51, 22, 0.28);
+			transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+		}
+
+		.login-button:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 24px 38px rgba(92, 51, 22, 0.3);
+			filter: saturate(1.05);
+		}
+
+		.login-button:active {
+			transform: translateY(0);
+		}
+
+		.login-button:disabled {
+			cursor: wait;
+			opacity: 0.8;
+		}
+
+		@media (max-width: 980px) {
+			.login-page {
+				padding: 18px;
+			}
+		}
+
+		@media (max-width: 640px) {
+			.login-panel {
+				width: min(100%, 340px);
+				padding: 24px 20px 22px;
+				border-radius: 24px 38px 22px 34px;
+			}
+
+			.brand-logo {
+				width: 66px;
+				height: 66px;
+			}
+
+			.brand h1 {
+				font-size: 21px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="login-page">
+		<section class="login-panel-wrap">
+			<div class="login-panel">
+				<div class="brand">
+					<img class="brand-logo" src="Logo_Enrekang_Elektronik.png" alt="Logo Enrekang Elektronik">
+					<h1>Toko Enrekang Elektronik</h1>
+					<p>Sistem Penjualan &amp; Manajemen Stok</p>
+				</div>
+
+				<form id="login-form" class="login-form">
+					<div class="field-group">
+						<label class="field-label" for="username">
+							<i class="fas fa-user"></i>
+							<span>Username</span>
+						</label>
+						<input id="username" name="username" class="field-input" type="text" placeholder="Masukkan username" autocomplete="username">
+					</div>
+
+					<div class="field-group">
+						<label class="field-label" for="password">
+							<i class="fas fa-lock"></i>
+							<span>Password</span>
+						</label>
+						<input id="password" name="password" class="field-input" type="password" placeholder="Masukkan password" autocomplete="current-password">
+					</div>
+
+					<div id="form-status" class="form-status" aria-live="polite"></div>
+
+					<button id="login-button" class="login-button" type="submit">Login</button>
+				</form>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		const AUTH_STORAGE_KEY = 'enrekang-current-user-v1';
+		const accounts = {
+			owner: {
+				password: 'owner123',
+				name: 'Owner',
+				role: 'owner'
+			},
+			admin: {
+				password: 'admin123',
+				name: 'Admin',
+				role: 'admin'
+			},
+			kasir: {
+				password: 'kasir123',
+				name: 'Kasir',
+				role: 'kasir'
+			}
+		};
+
+		const loginForm = document.getElementById('login-form');
+		const usernameInput = document.getElementById('username');
+		const passwordInput = document.getElementById('password');
+		const formStatus = document.getElementById('form-status');
+		const loginButton = document.getElementById('login-button');
+
+		function redirectToWebsite() {
+			window.location.href = 'website.html';
+		}
+
+		function setStatus(message, type = 'error') {
+			formStatus.textContent = message;
+			formStatus.classList.toggle('success', type === 'success');
+		}
+
+		function readCurrentUser() {
+			try {
+				const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+				return raw ? JSON.parse(raw) : null;
+			} catch (error) {
+				console.error('Gagal membaca sesi login:', error);
+				return null;
+			}
+		}
+
+		function saveCurrentUser(username, account) {
+			localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({
+				username,
+				name: account.name,
+				role: account.role,
+				loginAt: new Date().toISOString()
+			}));
+		}
+
+		if (readCurrentUser()) {
+			redirectToWebsite();
+		}
+
+		loginForm.addEventListener('submit', (event) => {
+			event.preventDefault();
+
+			const username = usernameInput.value.trim().toLowerCase();
+			const password = passwordInput.value;
+
+			if (!username || !password) {
+				setStatus('Username dan password wajib diisi.');
+				return;
+			}
+
+			const account = accounts[username];
+
+			if (!account || account.password !== password) {
+				setStatus('Username atau password salah.');
+				return;
+			}
+
+			loginButton.disabled = true;
+			setStatus('Login berhasil. Mengarahkan ke halaman utama...', 'success');
+			saveCurrentUser(username, account);
+
+			window.setTimeout(() => {
+				redirectToWebsite();
+			}, 450);
+		});
+	</script>
+</body>
+</html>

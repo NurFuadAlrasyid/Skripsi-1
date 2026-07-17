@@ -142,10 +142,23 @@
             transition: all 0.3s ease;
             padding: 8px 12px;
             border-radius: 14px;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
         }
 
         .profile-section:hover {
             background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .profile-shell {
+            position: relative;
+        }
+
+        .profile-section:focus-visible {
+            outline: 2px solid rgba(122, 80, 50, 0.35);
+            outline-offset: 2px;
         }
 
         .profile-avatar {
@@ -180,6 +193,198 @@
         .profile-role {
             color: #bdc3c7;
             font-size: 12px;
+        }
+
+        .profile-panel {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: min(320px, calc(100vw - 32px));
+            padding: 18px;
+            border-radius: 20px;
+            background: rgba(255, 252, 247, 0.98);
+            border: 1px solid rgba(122, 80, 50, 0.12);
+            box-shadow: 0 24px 45px rgba(70, 40, 18, 0.18);
+            display: none;
+            z-index: 120;
+        }
+
+        .profile-panel.is-open {
+            display: grid;
+            gap: 14px;
+        }
+
+        .profile-panel h3 {
+            font-size: 16px;
+            color: #2d2f35;
+            margin-bottom: 4px;
+        }
+
+        .profile-panel p {
+            color: #7d6f61;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .profile-panel-view {
+            display: none;
+        }
+
+        .profile-panel-view.is-active {
+            display: grid;
+            gap: 14px;
+        }
+
+        .profile-panel-menu {
+            display: grid;
+            gap: 10px;
+        }
+
+        .profile-panel-item {
+            width: 100%;
+            border: 1px solid rgba(122, 80, 50, 0.12);
+            border-radius: 16px;
+            background: #fff9f2;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .profile-panel-item:hover {
+            background: #fff3e6;
+            border-color: rgba(122, 80, 50, 0.22);
+        }
+
+        .profile-panel-item strong {
+            display: block;
+            color: #2d2f35;
+            font-size: 14px;
+        }
+
+        .profile-panel-item span {
+            color: #7d6f61;
+            font-size: 12px;
+        }
+
+        .profile-panel-item i {
+            color: #8a5a34;
+            font-size: 14px;
+        }
+
+        .profile-panel-back {
+            width: fit-content;
+            border: none;
+            background: transparent;
+            color: #8a5a34;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .profile-time-form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .profile-time-field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .profile-time-field label,
+        .profile-time-mode legend {
+            color: #5a5148;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .profile-time-field input {
+            border: 1px solid #dfd3c4;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font: inherit;
+            background: #ffffff;
+            color: #2f3136;
+        }
+
+        .profile-time-mode {
+            border: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 8px;
+        }
+
+        .profile-time-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: #fff7ee;
+            color: #4b4f58;
+            font-size: 13px;
+        }
+
+        .profile-time-option input {
+            accent-color: #8a5a34;
+        }
+
+        .profile-time-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .profile-time-actions button {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .profile-time-actions .primary {
+            background: linear-gradient(135deg, #8a5a34 0%, #a86c1d 100%);
+            color: #ffffff;
+        }
+
+        .profile-time-actions .secondary {
+            background: #fff3e6;
+            color: #7a5032;
+            border: 1px solid #ecd7bf;
+        }
+
+        .profile-time-status {
+            min-height: 18px;
+            color: #7d6f61;
+            font-size: 11px;
+        }
+
+        .profile-logout-button {
+            width: 100%;
+            border: 1px solid rgba(196, 61, 48, 0.18);
+            border-radius: 16px;
+            background: #fff2f0;
+            color: #c43d30;
+            padding: 12px 14px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .profile-logout-button:hover {
+            background: #ffe7e3;
         }
 
         .sidebar-footer {
@@ -269,6 +474,70 @@
             padding-top: 22px;
         }
 
+        .confirm-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(34, 24, 16, 0.38);
+            z-index: 400;
+        }
+
+        .confirm-modal.is-open {
+            display: flex;
+        }
+
+        .confirm-dialog {
+            width: min(420px, 100%);
+            background: #fffdf9;
+            border: 1px solid rgba(122, 80, 50, 0.12);
+            border-radius: 22px;
+            box-shadow: 0 28px 48px rgba(70, 40, 18, 0.2);
+            padding: 24px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .confirm-dialog h3 {
+            color: #2d2f35;
+            font-size: 20px;
+        }
+
+        .confirm-dialog p {
+            color: #746657;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .confirm-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .confirm-actions button {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 18px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .confirm-actions .secondary {
+            background: #f6eee3;
+            color: #7a5032;
+            border: 1px solid #e7d5be;
+        }
+
+        .confirm-actions .primary {
+            background: linear-gradient(135deg, #b84a3f 0%, #cf5e52 100%);
+            color: #ffffff;
+        }
+
         main {
             max-width: 1320px;
             margin: 0 auto;
@@ -327,6 +596,12 @@
             .content-datetime {
                 text-align: left;
             }
+
+            .profile-panel {
+                left: 0;
+                right: auto;
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -347,13 +622,12 @@
                 <li><a href="#" class="menu-link" data-menu="stok" data-title="Stok" data-subtitle="Pantau dan telusuri seluruh persediaan barang"><i class="fas fa-boxes"></i>Stok</a></li>
                 <li><a href="#" class="menu-link" data-menu="penjualan" data-title="Penjualan" data-subtitle="Catat transaksi kasir dan kelola pembayaran"><i class="fas fa-shopping-cart"></i>Penjualan</a></li>
                 <li><a href="#" class="menu-link" data-menu="laporan" data-title="Laporan" data-subtitle="Lihat omzet, laba, dan barang terlaris"><i class="fas fa-chart-bar"></i>Laporan</a></li>
-                <li><a href="#" class="menu-link" data-menu="pengaturan" data-title="Pengaturan" data-subtitle="Atur preferensi sistem dan informasi toko"><i class="fas fa-gear"></i>Pengaturan</a></li>
+                <li><a href="#" class="menu-link" data-menu="tentang" data-title="Tentang" data-subtitle="Lihat informasi toko dan profil aplikasi"><i class="fas fa-circle-info"></i>Tentang</a></li>
             </ul>
 
             <div class="sidebar-footer">
                 <strong>Toko Enrekang Elektronik</strong>
                 <p>Jl. Industri, Juppandang, Kec. Enrekang, Kabupaten Enrekang, Sulawesi Selatan 91711</p>
-                <small>&copy; 2026 All Rights Reserved</small>
             </div>
         </aside>
 
@@ -372,13 +646,70 @@
                 <div class="content-header-tools">
                     <div id="content-datetime" class="content-datetime"></div>
 
-                    <div class="profile-section">
-                        <div class="profile-avatar">
-                            <img src="foto_profil.png" alt="Profile Avatar">
-                        </div>
-                        <div class="profile-info">
-                            <div class="profile-name" style="color:#2f3136;">Alif Batara Radja</div>
-                            <div class="profile-role" style="color:#7d6f61;">Admin</div>
+                    <div class="profile-shell">
+                        <button id="profile-toggle" class="profile-section" type="button" aria-expanded="false" aria-controls="profile-panel">
+                            <div class="profile-avatar">
+                                <img src="foto_profil.png" alt="Profile Avatar">
+                            </div>
+                            <div class="profile-info">
+                                <div id="profile-name" class="profile-name" style="color:#2f3136;">Alif Batara Radja</div>
+                                <div id="profile-role" class="profile-role" style="color:#7d6f61;">Admin</div>
+                            </div>
+                        </button>
+
+                        <div id="profile-panel" class="profile-panel" aria-hidden="true">
+                            <div id="profile-panel-home" class="profile-panel-view is-active">
+                                <div>
+                                    <h3>Profil</h3>
+                                    <p>Pilih menu yang ingin Anda atur dari panel profil.</p>
+                                </div>
+
+                                <div class="profile-panel-menu">
+                                    <button id="profile-time-menu-button" type="button" class="profile-panel-item">
+                                        <div>
+                                            <strong>Time and Date</strong>
+                                            <span>Atur tampilan waktu secara otomatis atau manual.</span>
+                                        </div>
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+
+                                <button id="profile-logout-button" type="button" class="profile-logout-button">Log Out</button>
+                            </div>
+
+                            <div id="profile-panel-time" class="profile-panel-view">
+                                <button id="profile-back-button" type="button" class="profile-panel-back"><i class="fas fa-arrow-left"></i> Kembali</button>
+
+                                <div>
+                                    <h3>Time and Date</h3>
+                                    <p>Atur jam header dari profil. Anda bisa pakai waktu otomatis atau tentukan waktu manual.</p>
+                                </div>
+
+                                <form id="profile-time-form" class="profile-time-form">
+                                    <fieldset class="profile-time-mode">
+                                        <legend>Sumber waktu</legend>
+                                        <label class="profile-time-option">
+                                            <input type="radio" name="time-mode" value="auto" checked>
+                                            <span>Otomatis mengikuti waktu perangkat</span>
+                                        </label>
+                                        <label class="profile-time-option">
+                                            <input type="radio" name="time-mode" value="manual">
+                                            <span>Atur waktu manual</span>
+                                        </label>
+                                    </fieldset>
+
+                                    <div class="profile-time-field">
+                                        <label for="profile-manual-time">Waktu manual</label>
+                                        <input id="profile-manual-time" type="datetime-local">
+                                    </div>
+
+                                    <div class="profile-time-actions">
+                                        <button type="submit" class="primary">Simpan Waktu</button>
+                                        <button id="profile-time-reset" type="button" class="secondary">Reset Otomatis</button>
+                                    </div>
+                                    <div id="profile-time-status" class="profile-time-status"></div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -392,6 +723,17 @@
         </div>
     </div>
 
+    <div id="confirm-modal" class="confirm-modal" aria-hidden="true">
+        <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+            <h3 id="confirm-title">Konfirmasi Hapus</h3>
+            <p id="confirm-message">Apakah Anda yakin ingin menghapus data ini?</p>
+            <div class="confirm-actions">
+                <button id="confirm-no" type="button" class="secondary">Tidak</button>
+                <button id="confirm-yes" type="button" class="primary">Ya</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const menuLinks = document.querySelectorAll('.menu-link');
         const mainContainer = document.getElementById('konten-utama');
@@ -400,9 +742,161 @@
         const dateTimeElement = document.getElementById('content-datetime');
         const sidebar = document.getElementById('app-sidebar');
         const sidebarToggle = document.getElementById('sidebar-toggle');
+        const profileToggle = document.getElementById('profile-toggle');
+        const profilePanel = document.getElementById('profile-panel');
+        const profileNameElement = document.getElementById('profile-name');
+        const profileRoleElement = document.getElementById('profile-role');
+        const profileTimeForm = document.getElementById('profile-time-form');
+        const profileTimeReset = document.getElementById('profile-time-reset');
+        const profileTimeStatus = document.getElementById('profile-time-status');
+        const profileManualTimeInput = document.getElementById('profile-manual-time');
+        const profilePanelHome = document.getElementById('profile-panel-home');
+        const profilePanelTime = document.getElementById('profile-panel-time');
+        const profileTimeMenuButton = document.getElementById('profile-time-menu-button');
+        const profileBackButton = document.getElementById('profile-back-button');
+        const profileLogoutButton = document.getElementById('profile-logout-button');
+        const timeModeInputs = document.querySelectorAll('input[name="time-mode"]');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmTitle = document.getElementById('confirm-title');
+        const confirmMessage = document.getElementById('confirm-message');
+        const confirmNoButton = document.getElementById('confirm-no');
+        const confirmYesButton = document.getElementById('confirm-yes');
+        const AUTH_STORAGE_KEY = 'enrekang-current-user-v1';
+        const TIME_SETTINGS_KEY = 'enrekang-time-settings-v1';
+        const MENU_ACCESS = {
+            owner: ['dashboard', 'stok', 'penjualan', 'laporan', 'tentang'],
+            admin: ['dashboard', 'stok', 'penjualan', 'tentang'],
+            kasir: ['dashboard', 'penjualan', 'tentang']
+        };
+        let confirmResolver = null;
+
+        function redirectToLogin() {
+            window.location.href = 'login.html';
+        }
+
+        function readCurrentUser() {
+            try {
+                const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch (error) {
+                console.error('Gagal membaca sesi login:', error);
+                return null;
+            }
+        }
+
+        const currentUser = readCurrentUser();
+        const allowedMenus = MENU_ACCESS[currentUser?.role] || [];
+
+        if (!currentUser || allowedMenus.length === 0) {
+            redirectToLogin();
+        }
+
+        function getAllowedMenuLinks() {
+            return Array.from(menuLinks).filter((link) => allowedMenus.includes(link.dataset.menu));
+        }
+
+        function isMenuAllowed(menuName) {
+            return allowedMenus.includes(menuName);
+        }
+
+        function applyRoleAccess() {
+            Array.from(menuLinks).forEach((link) => {
+                const isAllowed = isMenuAllowed(link.dataset.menu);
+                link.parentElement.hidden = !isAllowed;
+                link.classList.toggle('active', false);
+            });
+
+            profileNameElement.textContent = currentUser.name || currentUser.username || 'Pengguna';
+            profileRoleElement.textContent = currentUser.role ? currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1) : 'Pengguna';
+        }
+
+        function getDefaultManualTimeValue(date = new Date()) {
+            const local = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+            return local.toISOString().slice(0, 16);
+        }
+
+        function readTimeSettings() {
+            try {
+                const raw = localStorage.getItem(TIME_SETTINGS_KEY);
+                if (!raw) {
+                    return {
+                        mode: 'auto',
+                        manualBase: '',
+                        syncedAt: ''
+                    };
+                }
+
+                const parsed = JSON.parse(raw);
+                return {
+                    mode: parsed.mode === 'manual' ? 'manual' : 'auto',
+                    manualBase: typeof parsed.manualBase === 'string' ? parsed.manualBase : '',
+                    syncedAt: typeof parsed.syncedAt === 'string' ? parsed.syncedAt : ''
+                };
+            } catch (error) {
+                console.error('Gagal membaca pengaturan waktu:', error);
+                return {
+                    mode: 'auto',
+                    manualBase: '',
+                    syncedAt: ''
+                };
+            }
+        }
+
+        function saveTimeSettings(settings) {
+            localStorage.setItem(TIME_SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        function getCurrentConfiguredDate() {
+            const settings = readTimeSettings();
+
+            if (settings.mode === 'manual' && settings.manualBase) {
+                const manualBaseTime = new Date(settings.manualBase).getTime();
+                const syncedAtTime = new Date(settings.syncedAt || settings.manualBase).getTime();
+
+                if (!Number.isNaN(manualBaseTime) && !Number.isNaN(syncedAtTime)) {
+                    return new Date(manualBaseTime + (Date.now() - syncedAtTime));
+                }
+            }
+
+            return new Date();
+        }
+
+        function setProfileStatus(message) {
+            profileTimeStatus.textContent = message;
+        }
+
+        function setProfileView(view) {
+            const showTime = view === 'time';
+            profilePanelHome.classList.toggle('is-active', !showTime);
+            profilePanelTime.classList.toggle('is-active', showTime);
+        }
+
+        function syncTimeForm() {
+            const settings = readTimeSettings();
+            const activeMode = settings.mode === 'manual' ? 'manual' : 'auto';
+
+            timeModeInputs.forEach((input) => {
+                input.checked = input.value === activeMode;
+            });
+
+            profileManualTimeInput.value = settings.manualBase ? getDefaultManualTimeValue(new Date(settings.manualBase)) : getDefaultManualTimeValue();
+            profileManualTimeInput.disabled = activeMode !== 'manual';
+            setProfileStatus(activeMode === 'manual' ? 'Waktu manual aktif.' : 'Saat ini memakai waktu perangkat.');
+        }
+
+        function toggleProfilePanel(forceOpen) {
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !profilePanel.classList.contains('is-open');
+            profilePanel.classList.toggle('is-open', shouldOpen);
+            profilePanel.setAttribute('aria-hidden', String(!shouldOpen));
+            profileToggle.setAttribute('aria-expanded', String(shouldOpen));
+            if (shouldOpen) {
+                setProfileView('home');
+                syncTimeForm();
+            }
+        }
 
         function updateDateTime() {
-            const now = new Date();
+            const now = getCurrentConfiguredDate();
             const dateText = new Intl.DateTimeFormat('id-ID', {
                 weekday: 'long',
                 day: '2-digit',
@@ -420,6 +914,30 @@
             dateTimeElement.innerHTML = `${dateText}<br>${timeText}`;
         }
 
+        function closeConfirmModal(result) {
+            confirmModal.classList.remove('is-open');
+            confirmModal.setAttribute('aria-hidden', 'true');
+            if (confirmResolver) {
+                confirmResolver(result);
+                confirmResolver = null;
+            }
+        }
+
+        window.showAppConfirm = ({
+            title = 'Konfirmasi Hapus',
+            message = 'Apakah Anda yakin ingin menghapus data ini?'
+        } = {}) => {
+            confirmTitle.textContent = title;
+            confirmMessage.textContent = message;
+            confirmModal.classList.add('is-open');
+            confirmModal.setAttribute('aria-hidden', 'false');
+            confirmNoButton.focus();
+
+            return new Promise((resolve) => {
+                confirmResolver = resolve;
+            });
+        };
+
         function setActivePage(link) {
             pageName.textContent = link.dataset.title || link.textContent.trim();
             pageSubtitle.textContent = link.dataset.subtitle || '';
@@ -427,16 +945,26 @@
 
         // Fungsi Load Konten
         async function loadContent(menuName) {
+            if (!isMenuAllowed(menuName)) {
+                mainContainer.innerHTML = `
+                    <div style="background: white; padding: 20px; border-radius: 18px; text-align: center; color: #7a5032; border: 1px solid rgba(122, 80, 50, 0.14);">
+                        <h2><i class="fas fa-lock"></i> Akses Ditolak</h2>
+                        <p>Anda tidak memiliki hak akses untuk membuka menu ${menuName}.</p>
+                    </div>`;
+                return;
+            }
+
             try {
                 // Mengambil file dari dalam folder "pages"
                 const response = await fetch(`pages/${menuName}.html`); 
                 
                 if (response.ok) {
                     const html = await response.text();
+                    const sanitizedHtml = html.replace(/<script[^>]*>[\s\S]*?IsThisFirstTime_Log_From_LiveServer[\s\S]*?<\/script>/gi, '');
                     
                     // Extract scripts BEFORE setting innerHTML
                     const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = html;
+                    tempDiv.innerHTML = sanitizedHtml;
                     const scripts = tempDiv.querySelectorAll('script');
                     const scriptsContent = [];
                     
@@ -448,7 +976,7 @@
                     });
                     
                     // Set HTML without scripts first
-                    mainContainer.innerHTML = html;
+                    mainContainer.innerHTML = sanitizedHtml;
 
                     document.querySelectorAll('script[data-dynamic-page-script="true"]').forEach(script => script.remove());
                     
@@ -490,6 +1018,10 @@
         menuLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault(); 
+
+                if (!isMenuAllowed(this.getAttribute('data-menu'))) {
+                    return;
+                }
                 
                 menuLinks.forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
@@ -505,12 +1037,116 @@
             sidebar.classList.toggle('is-open');
         });
 
+        profileToggle.addEventListener('click', (event) => {
+            event.stopPropagation();
+            toggleProfilePanel();
+        });
+
+        profilePanel.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        profileTimeMenuButton.addEventListener('click', () => {
+            setProfileView('time');
+            syncTimeForm();
+        });
+
+        profileBackButton.addEventListener('click', () => {
+            setProfileView('home');
+        });
+
+        profileLogoutButton.addEventListener('click', () => {
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+            toggleProfilePanel(false);
+            window.location.href = 'login.html';
+        });
+
+        confirmNoButton.addEventListener('click', () => {
+            closeConfirmModal(false);
+        });
+
+        confirmYesButton.addEventListener('click', () => {
+            closeConfirmModal(true);
+        });
+
+        confirmModal.addEventListener('click', (event) => {
+            if (event.target === confirmModal) {
+                closeConfirmModal(false);
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && confirmModal.classList.contains('is-open')) {
+                closeConfirmModal(false);
+            }
+        });
+
+        timeModeInputs.forEach((input) => {
+            input.addEventListener('change', () => {
+                profileManualTimeInput.disabled = input.value !== 'manual' || !input.checked;
+                setProfileStatus(input.value === 'manual' && input.checked ? 'Pilih tanggal dan jam yang ingin ditampilkan.' : 'Saat ini memakai waktu perangkat.');
+            });
+        });
+
+        profileTimeForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const selectedMode = document.querySelector('input[name="time-mode"]:checked')?.value || 'auto';
+
+            if (selectedMode === 'manual') {
+                if (!profileManualTimeInput.value) {
+                    setProfileStatus('Isi waktu manual terlebih dahulu.');
+                    profileManualTimeInput.focus();
+                    return;
+                }
+
+                saveTimeSettings({
+                    mode: 'manual',
+                    manualBase: new Date(profileManualTimeInput.value).toISOString(),
+                    syncedAt: new Date().toISOString()
+                });
+                setProfileStatus('Waktu manual disimpan.');
+            } else {
+                saveTimeSettings({
+                    mode: 'auto',
+                    manualBase: '',
+                    syncedAt: ''
+                });
+                setProfileStatus('Kembali ke waktu perangkat.');
+            }
+
+            updateDateTime();
+        });
+
+        profileTimeReset.addEventListener('click', () => {
+            saveTimeSettings({
+                mode: 'auto',
+                manualBase: '',
+                syncedAt: ''
+            });
+            syncTimeForm();
+            updateDateTime();
+        });
+
+        document.addEventListener('click', () => {
+            toggleProfilePanel(false);
+        });
+
+        applyRoleAccess();
+
+        syncTimeForm();
         updateDateTime();
         setInterval(updateDateTime, 60000);
 
         // Load halaman pertama kali
-        setActivePage(document.querySelector('.menu-link.active'));
-        loadContent('dashboard');
+        const firstAllowedLink = getAllowedMenuLinks()[0];
+
+        if (!firstAllowedLink) {
+            redirectToLogin();
+        } else {
+            firstAllowedLink.classList.add('active');
+            setActivePage(firstAllowedLink);
+            loadContent(firstAllowedLink.dataset.menu);
+        }
     </script>
 </body>
 </html>
