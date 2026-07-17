@@ -4,6 +4,7 @@
     const STOCK_ADJUSTMENT_KEY = 'enrekang-stock-adjustments-v1';
     const STOCK_ACTIVITY_KEY = 'enrekang-stock-activities-v1';
     const CUSTOM_ITEMS_KEY = 'enrekang-custom-items-v1';
+    const DELETED_ITEMS_KEY = 'enrekang-deleted-items-v1';
     const TIME_SETTINGS_KEY = 'enrekang-time-settings-v1';
     const DATA_URL = 'data.json';
     const DAY_FORMATTER = new Intl.DateTimeFormat('id-ID', {
@@ -177,12 +178,34 @@
         emitStockEvent();
     }
 
+    function getDeletedItemKeys() {
+        try {
+            const raw = localStorage.getItem(DELETED_ITEMS_KEY);
+            if (!raw) {
+                return [];
+            }
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed.filter((itemKey) => typeof itemKey === 'string' && itemKey) : [];
+        } catch (error) {
+            console.error('Gagal membaca daftar barang terhapus:', error);
+            return [];
+        }
+    }
+
+    function saveDeletedItemKeys(itemKeys) {
+        localStorage.setItem(DELETED_ITEMS_KEY, JSON.stringify(itemKeys));
+        emitStockEvent();
+    }
+
     async function getSourceItems() {
         const [baseItems, customItems] = await Promise.all([
             getBaseSourceItems(),
             Promise.resolve(getCustomItems())
         ]);
-        return [...baseItems, ...customItems].map((item) => ({ ...item }));
+        const deletedKeys = new Set(getDeletedItemKeys());
+        return [...baseItems, ...customItems]
+            .filter((item) => !deletedKeys.has(item.__itemKey))
+            .map((item) => ({ ...item }));
     }
 
     function getTransactions() {
@@ -295,13 +318,20 @@
             map[item.__itemKey] = item;
             return map;
         }, {});
+        const deletedKeys = new Set(getDeletedItemKeys());
 
         function decorateNode(node, path) {
             if (Array.isArray(node)) {
-                return node.map((item) => {
-                    const decorated = stockMap[getItemKey({ ...item, __path: path.join(' / ') })];
-                    return decorated ? { ...decorated } : { ...item, currentStock: Number(item.stok || 0) };
-                });
+                return node.reduce((result, item) => {
+                    const itemKey = getItemKey({ ...item, __path: path.join(' / ') });
+                    if (deletedKeys.has(itemKey)) {
+                        return result;
+                    }
+
+                    const decorated = stockMap[itemKey];
+                    result.push(decorated ? { ...decorated } : { ...item, currentStock: Number(item.stok || 0) });
+                    return result;
+                }, []);
             }
 
             const result = {};
@@ -656,6 +686,40 @@
         return { ...customItem };
     }
 
+    async function deleteItem(itemKey) {
+        const normalizedItemKey = String(itemKey || '').trim();
+        if (!normalizedItemKey) {
+            throw new Error('Barang yang ingin dihapus tidak valid.');
+        }
+
+        const items = await getSourceItems();
+        const targetItem = items.find((item) => item.__itemKey === normalizedItemKey);
+        if (!targetItem) {
+            throw new Error('Barang yang ingin dihapus tidak ditemukan.');
+        }
+
+        if (targetItem.__isCustom) {
+            const customItems = getCustomItems().filter((item) => item.__itemKey !== normalizedItemKey);
+            saveCustomItems(customItems);
+        } else {
+            const deletedItemKeys = getDeletedItemKeys();
+            if (!deletedItemKeys.includes(normalizedItemKey)) {
+                saveDeletedItemKeys([normalizedItemKey, ...deletedItemKeys]);
+            }
+        }
+
+        const adjustments = getStockAdjustments();
+        if (Object.prototype.hasOwnProperty.call(adjustments, normalizedItemKey)) {
+            delete adjustments[normalizedItemKey];
+            saveStockAdjustments(adjustments);
+        }
+
+        const nextActivities = getStockActivities().filter((activity) => activity.itemKey !== normalizedItemKey);
+        saveStockActivities(nextActivities);
+
+        return { ...targetItem };
+    }
+
     function getTransactionsInRange(startDate, endDate) {
         return getSortedTransactions().filter((transaction) => isTransactionInRange(transaction, startDate, endDate));
     }
@@ -762,6 +826,7 @@
         addStock,
         setStock,
         addCustomItem,
+        deleteItem,
         getDashboardSummary,
         getReport,
         clearTransactions

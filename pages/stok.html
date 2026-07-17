@@ -1408,7 +1408,7 @@
                                             <button type="button" class="stok-action-icon" data-table-action="edit" data-item-key="${escapeHtml(item.__itemKey)}" data-item-name="${escapeHtml(item.namaItem || '-') }" title="Edit stok barang">
                                                 <i class="fas fa-pen"></i>
                                             </button>
-                                            <button type="button" class="stok-action-icon delete" data-table-action="delete" data-item-name="${escapeHtml(item.namaItem || '-') }" title="Hapus data visual">
+                                            <button type="button" class="stok-action-icon delete" data-table-action="delete" data-item-key="${escapeHtml(item.__itemKey)}" data-item-name="${escapeHtml(item.namaItem || '-') }" title="Hapus barang">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                             <button type="button" class="stok-add-button" data-item-key="${escapeHtml(item.__itemKey)}" data-item-name="${escapeHtml(item.namaItem || '-')}">Tambah Stok</button>
@@ -1549,6 +1549,27 @@
             }
         };
 
+        const handleDeleteItem = async (button) => {
+            const itemKey = button.dataset.itemKey || '';
+            const itemName = button.dataset.itemName || 'barang';
+
+            const confirmed = await window.showAppConfirm({
+                title: 'Konfirmasi Hapus Barang',
+                message: `${itemName} akan dihapus dari data stok. Lanjutkan?`
+            });
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                await store.deleteItem(itemKey);
+                setMessage(`Barang ${itemName} berhasil dihapus dari data stok.`, 'success');
+                await refreshStockView();
+            } catch (error) {
+                setMessage(error.message, 'error');
+            }
+        };
+
         searchButton.addEventListener('click', () => {
             clearMessage();
             state.searchQuery = searchInput.value;
@@ -1644,24 +1665,18 @@
             const visualAction = event.target.closest('[data-table-action]');
             if (visualAction) {
                 const action = visualAction.dataset.tableAction;
-                const itemName = visualAction.dataset.itemName || 'barang';
                 if (action === 'edit') {
                     clearMessage();
                     openEditStockModal(visualAction.dataset.itemKey || '');
                     return;
                 }
 
-                const label = action === 'edit' ? 'Edit' : 'Hapus';
                 if (action === 'delete') {
-                    const confirmed = await window.showAppConfirm({
-                        title: 'Konfirmasi Hapus Barang',
-                        message: `${itemName} akan dihapus dari tampilan stok. Lanjutkan?`
-                    });
-                    if (!confirmed) {
-                        return;
-                    }
+                    clearMessage();
+                    await handleDeleteItem(visualAction);
+                    return;
                 }
-                setMessage(`${label} untuk ${itemName} ditampilkan sebagai aksi visual dan belum mengubah data stok.`, 'success');
+
                 return;
             }
 
