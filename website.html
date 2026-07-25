@@ -943,6 +943,8 @@
             pageSubtitle.textContent = link.dataset.subtitle || '';
         }
 
+        const PAGE_ASSET_VERSION = '20260725-2';
+
         // Fungsi Load Konten
         async function loadContent(menuName) {
             if (!isMenuAllowed(menuName)) {
@@ -956,7 +958,9 @@
 
             try {
                 // Mengambil file dari dalam folder "pages"
-                const response = await fetch(`pages/${menuName}.html`); 
+                const response = await fetch(`pages/${menuName}.html?v=${PAGE_ASSET_VERSION}`, {
+                    cache: 'no-store'
+                }); 
                 
                 if (response.ok) {
                     const html = await response.text();

@@ -197,7 +197,7 @@
 <div class="sales-shell">
     <div class="sales-card">
         <h2><i class="fas fa-shopping-cart" style="color: #7a5032;"></i> Kasir Penjualan</h2>
-        <p>Gunakan pencarian nama, kode item, atau barcode untuk menambahkan barang ke keranjang. Transaksi tersimpan di browser ini dan otomatis mengurangi stok tampilan.</p>
+        <p>Gunakan pencarian nama, kode item, atau barcode untuk menambahkan barang ke keranjang. Transaksi akan disimpan ke database MySQL dan stok tampilan akan ikut diperbarui.</p>
     </div>
 
     <div class="sales-grid">
@@ -248,7 +248,7 @@
     </div>
 </div>
 
-<script src="app-store.js?v=20260701"></script>
+<script src="app-store.js?v=20260725"></script>
 <script>
     (async () => {
         const store = window.EnrekangStore;
@@ -264,6 +264,7 @@
         const summaryTotal = document.getElementById('summary-total');
         const summaryChange = document.getElementById('summary-change');
         const summaryReady = document.getElementById('summary-ready');
+        const checkoutButton = document.getElementById('sales-checkout');
 
         const state = {
             items: [],
@@ -456,9 +457,12 @@
         paymentInput.addEventListener('input', renderSummary);
         searchInput.addEventListener('input', renderResults);
 
-        document.getElementById('sales-checkout').addEventListener('click', async () => {
+        checkoutButton.addEventListener('click', async () => {
             try {
                 clearAlert();
+                checkoutButton.disabled = true;
+                checkoutButton.textContent = 'Menyimpan...';
+
                 const transaction = await store.createTransaction({
                     cart: state.cart,
                     customerName: customerInput.value.trim(),
@@ -470,10 +474,13 @@
                 state.cart = [];
                 paymentInput.value = '';
                 notesInput.value = '';
-                setAlert('success', `Transaksi ${transaction.invoiceNumber} berhasil disimpan. Total ${store.formatRupiah(transaction.total)}.`);
+                setAlert('success', `Transaksi ${transaction.invoiceNumber} berhasil disimpan ke database dengan ID ${transaction.transactionId}. Total ${store.formatRupiah(transaction.total)}.`);
                 await refreshItems();
             } catch (error) {
                 setAlert('error', error.message);
+            } finally {
+                checkoutButton.disabled = false;
+                checkoutButton.textContent = 'Simpan Transaksi';
             }
         });
 

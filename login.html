@@ -257,23 +257,6 @@
 
 	<script>
 		const AUTH_STORAGE_KEY = 'enrekang-current-user-v1';
-		const accounts = {
-			owner: {
-				password: 'owner123',
-				name: 'Owner',
-				role: 'owner'
-			},
-			admin: {
-				password: 'admin123',
-				name: 'Admin',
-				role: 'admin'
-			},
-			kasir: {
-				password: 'kasir123',
-				name: 'Kasir',
-				role: 'kasir'
-			}
-		};
 
 		const loginForm = document.getElementById('login-form');
 		const usernameInput = document.getElementById('username');
@@ -313,7 +296,7 @@
 			redirectToWebsite();
 		}
 
-		loginForm.addEventListener('submit', (event) => {
+		loginForm.addEventListener('submit', async (event) => {
 			event.preventDefault();
 
 			const username = usernameInput.value.trim().toLowerCase();
@@ -324,20 +307,44 @@
 				return;
 			}
 
-			const account = accounts[username];
-
-			if (!account || account.password !== password) {
-				setStatus('Username atau password salah.');
-				return;
-			}
-
 			loginButton.disabled = true;
-			setStatus('Login berhasil. Mengarahkan ke halaman utama...', 'success');
-			saveCurrentUser(username, account);
+			setStatus('Memeriksa data login...', 'success');
 
-			window.setTimeout(() => {
-				redirectToWebsite();
-			}, 450);
+			try {
+				const response = await fetch('login.php', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					body: new URLSearchParams({
+						username,
+						password
+					})
+				});
+
+				if (!response.ok) {
+					throw new Error('Gagal menghubungi server login.');
+				}
+
+				const result = await response.json();
+
+				if (!result.success || !result.user) {
+					setStatus(result.message || 'Username atau password salah.');
+					loginButton.disabled = false;
+					return;
+				}
+
+				setStatus('Login berhasil. Mengarahkan ke halaman utama...', 'success');
+				saveCurrentUser(result.user.username, result.user);
+
+				window.setTimeout(() => {
+					redirectToWebsite();
+				}, 450);
+			} catch (error) {
+				console.error('Gagal memproses login:', error);
+				setStatus('Login gagal. Pastikan website dibuka lewat localhost.');
+				loginButton.disabled = false;
+			}
 		});
 	</script>
 </body>

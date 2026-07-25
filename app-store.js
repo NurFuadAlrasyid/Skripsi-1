@@ -6,7 +6,8 @@
     const CUSTOM_ITEMS_KEY = 'enrekang-custom-items-v1';
     const DELETED_ITEMS_KEY = 'enrekang-deleted-items-v1';
     const TIME_SETTINGS_KEY = 'enrekang-time-settings-v1';
-    const DATA_URL = 'data.json';
+    const TRANSACTION_API_URL = 'ambil_transaksi.php';
+    const DATA_URL = 'data_barang.php';
     const DAY_FORMATTER = new Intl.DateTimeFormat('id-ID', {
         day: '2-digit',
         month: 'short',
@@ -22,6 +23,7 @@
 
     let sourceDataPromise;
     let sourceItemsPromise;
+    let transactionSyncPromise;
 
     function formatRupiah(value) {
         const amount = Number(value) || 0;
@@ -92,6 +94,16 @@
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
+    }
+
+    function readCurrentUser() {
+        try {
+            const raw = localStorage.getItem('enrekang-current-user-v1');
+            return raw ? JSON.parse(raw) : null;
+        } catch (error) {
+            console.error('Gagal membaca user aktif:', error);
+            return null;
+        }
     }
 
     function normalizeText(value) {
@@ -262,6 +274,34 @@
         emitStockEvent();
     }
 
+    async function syncTransactionsFromServer(force = false) {
+        if (!force && transactionSyncPromise) {
+            return transactionSyncPromise;
+        }
+
+        transactionSyncPromise = fetch(TRANSACTION_API_URL)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Gagal memuat transaksi dari server.');
+                }
+                return response.json();
+            })
+            .then((payload) => {
+                const transactions = Array.isArray(payload.transactions) ? payload.transactions : [];
+                saveTransactions(transactions);
+                return transactions;
+            })
+            .catch((error) => {
+                console.error('Gagal sinkron transaksi:', error);
+                return getTransactions();
+            })
+            .finally(() => {
+                transactionSyncPromise = null;
+            });
+
+        return transactionSyncPromise;
+    }
+
     function saveStockAdjustments(adjustments) {
         localStorage.setItem(STOCK_ADJUSTMENT_KEY, JSON.stringify(adjustments));
         emitStockEvent();
@@ -294,6 +334,7 @@
     }
 
     async function getEffectiveItems() {
+        await syncTransactionsFromServer();
         const [items, transactions] = await Promise.all([getSourceItems(), Promise.resolve(getTransactions())]);
         const soldMap = getSoldQuantityMap(transactions);
         const addedMap = getAddedQuantityMap();
@@ -399,8 +440,23 @@
     function buildInvoiceNumber(transactions, createdAt) {
         const now = new Date(createdAt);
         const datePart = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-        const dailyCount = transactions.filter((transaction) => transaction.invoiceNumber.includes(datePart)).length + 1;
-        return `INV-${datePart}-${String(dailyCount).padStart(3, '0')}`;
+        const prefix = `INV-${datePart}-`;
+        const lastSequence = transactions.reduce((maxValue, transaction) => {
+            const invoiceNumber = String(transaction.invoiceNumber || '').trim();
+            if (!invoiceNumber.startsWith(prefix)) {
+                return maxValue;
+            }
+
+            const sequenceText = invoiceNumber.slice(prefix.length);
+            const sequenceValue = Number(sequenceText);
+            if (!Number.isInteger(sequenceValue) || sequenceValue < 0) {
+                return maxValue;
+            }
+
+            return Math.max(maxValue, sequenceValue);
+        }, 0);
+
+        return `${prefix}${String(lastSequence + 1).padStart(3, '0')}`;
     }
 
     async function createTransaction(payload) {
@@ -447,6 +503,7 @@
             throw new Error('Nominal bayar lebih kecil dari total belanja.');
         }
 
+        await syncTransactionsFromServer(true);
         const transactions = getSortedTransactions();
         const createdAt = getCurrentConfiguredTimestamp();
         const transaction = {
@@ -465,52 +522,86 @@
             items: lineItems
         };
 
-        saveTransactions([transaction, ...transactions]);
-        return transaction;
-    }
-
-    function deleteTransaction(transactionId) {
-        const transactions = getTransactions();
-        const nextTransactions = transactions.filter((transaction) => transaction.id !== transactionId);
-
-        if (nextTransactions.length === transactions.length) {
-            throw new Error('Transaksi yang ingin dihapus tidak ditemukan.');
-        }
-
-        saveTransactions(nextTransactions);
-    }
-
-    function deleteTransactionItem(transactionId, itemKey) {
-        const transactions = getTransactions();
-        const nextTransactions = transactions.flatMap((transaction) => {
-            if (transaction.id !== transactionId) {
-                return [transaction];
-            }
-
-            const nextItems = (transaction.items || []).filter((item) => item.itemKey !== itemKey);
-            if (nextItems.length === (transaction.items || []).length) {
-                throw new Error('Item transaksi yang ingin dihapus tidak ditemukan.');
-            }
-
-            if (!nextItems.length) {
-                return [];
-            }
-
-            const total = nextItems.reduce((sum, item) => sum + Number(item.subtotal || 0), 0);
-            const totalCost = nextItems.reduce((sum, item) => sum + (Number(item.qty || 0) * Number(item.hargaPokok || 0)), 0);
-            const totalItems = nextItems.reduce((sum, item) => sum + Number(item.qty || 0), 0);
-
-            return [{
+        const currentUser = readCurrentUser();
+        const saveResponse = await fetch('simpan_transaksi.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
                 ...transaction,
-                items: nextItems,
-                total,
-                totalCost,
-                totalItems,
-                changeAmount: Math.max(0, Number(transaction.paymentAmount || 0) - total)
-            }];
+                user: currentUser ? {
+                    username: currentUser.username || '',
+                    name: currentUser.name || transaction.cashierName
+                } : {
+                    username: '',
+                    name: transaction.cashierName
+                }
+            })
         });
 
-        saveTransactions(nextTransactions);
+        const saveResponseText = await saveResponse.text();
+        let saveResult = null;
+
+        try {
+            saveResult = saveResponseText ? JSON.parse(saveResponseText) : null;
+        } catch (error) {
+            throw new Error(`Server mengirim respon yang tidak valid: ${saveResponseText || 'kosong'}`);
+        }
+
+        if (!saveResponse.ok) {
+            throw new Error(saveResult?.message || `Gagal menyimpan transaksi ke server (${saveResponse.status}).`);
+        }
+
+        if (!saveResult.success) {
+            throw new Error(saveResult.message || 'Gagal menyimpan transaksi ke database.');
+        }
+
+        await syncTransactionsFromServer(true);
+        return {
+            ...transaction,
+            transactionId: Number(saveResult.transactionId || 0),
+            serverMessage: saveResult.message || ''
+        };
+    }
+
+    async function deleteTransaction(transactionId) {
+        const response = await fetch('hapus_transaksi.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                transactionId: Number(transactionId || 0)
+            })
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Transaksi yang ingin dihapus tidak ditemukan.');
+        }
+
+        await syncTransactionsFromServer(true);
+    }
+
+    async function deleteTransactionItem(transactionId, detailId) {
+        const response = await fetch('hapus_item_transaksi.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                transactionId: Number(transactionId || 0),
+                detailId: Number(detailId || 0)
+            })
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Item transaksi yang ingin dihapus tidak ditemukan.');
+        }
+
+        await syncTransactionsFromServer(true);
     }
 
     async function addStock(itemKey, quantity) {
@@ -725,6 +816,7 @@
     }
 
     async function getDashboardSummary() {
+        await syncTransactionsFromServer();
         const items = await getEffectiveItems();
         const transactions = getSortedTransactions();
         const today = getLocalDateString();
@@ -745,6 +837,7 @@
     }
 
     async function getReport(startDate, endDate) {
+        await syncTransactionsFromServer();
         const transactions = getTransactionsInRange(startDate, endDate);
         const summary = transactions.reduce((result, transaction) => {
             result.totalOmzet += Number(transaction.total || 0);
@@ -777,6 +870,7 @@
 
                 lineItems.push({
                     transactionId: transaction.id,
+                    detailId: item.detailId || 0,
                     itemKey: item.itemKey,
                     namaItem: item.namaItem,
                     customerName: String(transaction.customerName || '').trim() === 'Pelanggan Umum' ? '' : String(transaction.customerName || '').trim(),
@@ -818,6 +912,7 @@
         getStructuredStock,
         searchItems,
         getStockActivities,
+        syncTransactions: syncTransactionsFromServer,
         getTransactions: getSortedTransactions,
         getTransactionsInRange,
         createTransaction,

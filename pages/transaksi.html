@@ -76,11 +76,11 @@
 
 <div class="transaction-card">
     <h2 style="color: #333; margin-bottom: 8px;"><i class="fas fa-exchange-alt" style="color: #7a5032;"></i> Riwayat Transaksi</h2>
-    <p style="color: #666; margin-bottom: 20px;">Semua transaksi diambil dari penyimpanan lokal browser ini.</p>
+    <p style="color: #666; margin-bottom: 20px;">Semua transaksi diambil langsung dari database MySQL melalui backend PHP.</p>
     <div id="transaction-list" class="transaction-list"></div>
 </div>
 
-<script src="app-store.js?v=20260701"></script>
+<script src="app-store.js?v=20260725"></script>
 <script>
     (() => {
         const store = window.EnrekangStore;
@@ -95,7 +95,8 @@
                 .replace(/'/g, '&#39;');
         }
 
-        function renderTransactions() {
+        async function renderTransactions() {
+            await store.syncTransactions();
             const transactions = store.getTransactions();
 
             if (!transactions.length) {
@@ -159,8 +160,8 @@
             }
 
             try {
-                store.deleteTransaction(transactionId);
-                renderTransactions();
+                await store.deleteTransaction(transactionId);
+                await renderTransactions();
             } catch (error) {
                 window.alert(error.message);
             }

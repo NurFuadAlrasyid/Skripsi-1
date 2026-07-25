@@ -78,7 +78,7 @@
     <div id="report-top-items"></div>
 </div>
 
-<script src="app-store.js?v=20260701"></script>
+<script src="app-store.js?v=20260725"></script>
 <script>
     (() => {
         const store = window.EnrekangStore;
@@ -139,7 +139,7 @@
                                 <td>${store.formatRupiah(item.omzet)}</td>
                                 <td>${item.notes || '-'}</td>
                                 <td>
-                                    <button type="button" class="report-delete-button" data-transaction-id="${item.transactionId}" data-item-key="${item.itemKey}" title="Hapus item transaksi">
+                                    <button type="button" class="report-delete-button" data-transaction-id="${item.transactionId}" data-detail-id="${item.detailId}" title="Hapus item transaksi">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -149,7 +149,7 @@
                 </table>
             `;
 
-            topItemsContainer.querySelectorAll('[data-transaction-id][data-item-key]').forEach((button) => {
+            topItemsContainer.querySelectorAll('[data-transaction-id][data-detail-id]').forEach((button) => {
                 button.addEventListener('click', async () => {
                     const confirmed = await window.showAppConfirm({
                         title: 'Konfirmasi Hapus Laporan',
@@ -160,7 +160,7 @@
                     }
 
                     try {
-                        store.deleteTransactionItem(button.dataset.transactionId, button.dataset.itemKey);
+                        await store.deleteTransactionItem(button.dataset.transactionId, button.dataset.detailId);
                         await renderReport();
                     } catch (error) {
                         window.alert(error.message);
